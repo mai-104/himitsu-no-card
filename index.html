@@ -291,7 +291,7 @@ const BG=(()=>{
 })();
 
 /* ---------- ゲーム本体 ---------- */
-let G=null, undo=[], busy=false;
+let G=null, undo=[], busy=false, autoArmed=true;
 const board=$('board');
 const els=[]; const pos={};
 for(let id=0;id<52;id++){
@@ -372,7 +372,8 @@ function render(){
  slots.stock.textContent=G.stock.length?'':(G.waste.length?'↻':'');
  $('movesLbl').textContent='手数 '+G.moves;
  $('undoBtn').disabled=!undo.length;
- $('autoBtn').style.display=(!G.won&&canAutoFinish())?'block':'none';
+ $('autoBtn').style.display='none';
+ if(autoArmed&&!busy&&!G.won&&canAutoFinish()){autoArmed=false;busy=true;setTimeout(()=>{busy=false;autoFinish()},350)}
 }
 
 /* ルール */
@@ -389,6 +390,7 @@ function doMove(src,cards,dest,di){
  afterMove();
 }
 function afterMove(){
+ autoArmed=true;
  G.moves++; if(!G.started){G.started=true}
  clearHint();
  render(); persist();
@@ -541,7 +543,7 @@ $('startBtn').onclick=startNew;
 $('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;undo=[];$('timeLbl').textContent=fmt(G.time);show('game')};
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
 $('newBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
-$('undoBtn').onclick=()=>{if(busy||!undo.length)return;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();render();persist()};
+$('undoBtn').onclick=()=>{if(busy||!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();render();persist()};
 $('hintBtn').onclick=()=>{if(!busy&&G)hint()};
 $('autoBtn').onclick=autoFinish;
 $('againBtn').onclick=()=>{$('win').classList.remove('on');newGame();$('timeLbl').textContent='0:00';layout()};
