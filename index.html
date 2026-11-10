@@ -122,11 +122,11 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <div class="panel howto">
   <details>
    <summary>遊び方（クラシック）</summary>
-   <p>右上の4つの場所に、マークごとに A→2→3…→K の順でカードを全部集めたらクリアです。</p>
+   <p>左上の4つの場所に、マークごとに A→2→3…→K の順でカードを全部集めたらクリアです。</p>
    <p>下の7列では、<b>赤と黒を交互</b>に、<b>数字が1つ小さいカード</b>を重ねられます。何枚か重なったまとまりも一緒に動かせます。</p>
    <p>空いた列には K（または K から始まるまとまり）だけ置けます。</p>
-   <p>左上の山をタップするとカードがめくれます。山がなくなったらもう一度タップで、何回でも最初から回せます。</p>
-   <p>カードは<b>タップ</b>すると置ける場所へ自動で動きます。<b>ドラッグ</b>で好きな場所へ運ぶこともできます。</p>
+   <p>右上の山をタップするとカードがめくれます。山がなくなったらもう一度タップで、何回でも最初から回せます。</p>
+   <p>カードを<b>1回タップ</b>すると下の列の置ける場所へ、<b>2回タップ</b>すると左上の置き場へ動きます。<b>ドラッグ</b>で好きな場所へ運ぶこともできます。</p>
   </details>
  </div>
 
@@ -339,8 +339,8 @@ function layout(){
  const R=document.documentElement.style;
  R.setProperty('--cw',cw+'px');R.setProperty('--ch',ch+'px');
  const sp=(el,x,y)=>el.style.transform=`translate(${x}px,${y}px)`;
- sp(slots.stock,colX(0),topY);
- for(let i=0;i<4;i++)sp(slots['f'+i],colX(3+i),topY);
+ sp(slots.stock,colX(6),topY);
+ for(let i=0;i<4;i++)sp(slots['f'+i],colX(i),topY);
  for(let i=0;i<7;i++)sp(slots['t'+i],colX(i),tabTop);
  if(G)render();
 }
@@ -348,12 +348,9 @@ addEventListener('resize',()=>{if($('game').classList.contains('on')){layout();B
 
 function colOffsets(col){
  const avail=board.clientHeight-tabTop-8;
- let dn=Math.round(ch*.13), upO=Math.round(ch*.3);
- const d=col.filter(c=>!c.up).length, u=col.length-d;
- const need=d*dn+Math.max(0,u-1)*upO+ch;
- if(need>avail&&u>1){upO=Math.max(Math.round(ch*.16),Math.floor((avail-ch-d*dn)/(u-1)))}
- if(d*dn+Math.max(0,u-1)*upO+ch>avail&&d>0){dn=Math.max(3,Math.floor((avail-ch-Math.max(0,u-1)*upO)/d))}
- return {dn,upO};
+ let o=Math.round(ch*.3);
+ if(col.length>1&&(col.length-1)*o+ch>avail)o=Math.max(6,Math.floor((avail-ch)/(col.length-1)));
+ return {dn:o,upO:o};
 }
 function place(c,x,y,z,pile,pi,idx){
  const el=els[c.id];
@@ -364,10 +361,10 @@ function place(c,x,y,z,pile,pi,idx){
  el.dataset.pile=pile;el.dataset.pi=pi;el.dataset.idx=idx;
 }
 function render(){
- G.stock.forEach((c,i)=>place(c,colX(0),topY,10+i,'stock',0,i));
+ G.stock.forEach((c,i)=>place(c,colX(6),topY,10+i,'stock',0,i));
  const v=G.draw===3?3:1, n=G.waste.length;
- G.waste.forEach((c,i)=>{const k=Math.max(0,i-(n-v));place(c,colX(1)+k*Math.round(cw*.3),topY,10+i,'waste',0,i)});
- G.found.forEach((f,fi)=>f.forEach((c,i)=>place(c,colX(3+fi),topY,10+i,'found',fi,i)));
+ G.waste.forEach((c,i)=>{const k=Math.max(0,i-(n-v));place(c,colX(v===3?4:5)+k*Math.round(cw*.3),topY,10+i,'waste',0,i)});
+ G.found.forEach((f,fi)=>f.forEach((c,i)=>place(c,colX(fi),topY,10+i,'found',fi,i)));
  G.tab.forEach((col,ci)=>{
   const {dn,upO}=colOffsets(col); let y=tabTop;
   col.forEach((c,i)=>{place(c,colX(ci),y,100+i,'tab',ci,i);y+=c.up?upO:dn});
@@ -411,16 +408,35 @@ function tapStock(){
  }
 }
 
-function findTarget(src,cards){
+function foundTarget(src,cards){
+ if(cards.length!==1||src.pile==='found')return null;
+ for(let i=0;i<4;i++)if(canFound(cards[0],i))return['found',i];
+ return null;
+}
+function tabTarget(src,cards){
  const c=cards[0];
- if(cards.length===1&&src.pile!=='found'){
-  for(let i=0;i<4;i++)if(canFound(c,i))return['found',i];
- }
  for(let i=0;i<7;i++){if(src.pile==='tab'&&src.pi===i)continue;if(G.tab[i].length&&canTab(c,i))return['tab',i]}
  if(c.r===13&&!(src.pile==='tab'&&src.idx===0)){
   for(let i=0;i<7;i++)if(!G.tab[i].length)return['tab',i];
  }
  return null;
+}
+function findTarget(src,cards){return foundTarget(src,cards)||tabTarget(src,cards)}
+let tapWait=null;
+function onTap(src,cards){
+ const id=cards[0].id;
+ if(tapWait&&tapWait.id===id){ // 2回目のタップ → 上の置き場へ
+  clearTimeout(tapWait.tm); tapWait=null;
+  const f=foundTarget(src,cards); if(f)doMove(src,cards,f[0],f[1]);else shake(cards);
+  return;
+ }
+ if(tapWait){clearTimeout(tapWait.tm);tapWait=null}
+ const tg=tabTarget(src,cards);
+ if(foundTarget(src,cards)){ // 2回目を少し待つ
+  tapWait={id,tm:setTimeout(()=>{tapWait=null;if(tg)doMove(src,cards,tg[0],tg[1])},300)};
+  return;
+ }
+ if(tg)doMove(src,cards,tg[0],tg[1]);else shake(cards);
 }
 function shake(cards){cards.forEach(c=>{const el=els[c.id];el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')})}
 
@@ -485,8 +501,7 @@ function endDrag(e){
  const d=drag; drag=null;
  d.cards.forEach(c=>els[c.id].classList.remove('dragging'));
  if(!d.moved){
-  const tg=findTarget(d.src,d.cards);
-  if(tg)doMove(d.src,d.cards,tg[0],tg[1]);else shake(d.cards);
+  onTap(d.src,d.cards);
   return;
  }
  const p0=pos[d.cards[0].id];
@@ -494,7 +509,7 @@ function endDrag(e){
  const col=Math.max(0,Math.min(6,Math.floor((cx-offX-gap/2)/(cw+gap))));
  let ok=false;
  if(cy<tabTop-ch*.15){
-  if(col>=3&&d.cards.length===1&&d.src.pile!=='found'&&canFound(d.cards[0],col-3)){doMove(d.src,d.cards,'found',col-3);ok=true}
+  if(col<=3&&d.cards.length===1&&d.src.pile!=='found'&&canFound(d.cards[0],col)){doMove(d.src,d.cards,'found',col);ok=true}
  }else{
   if(!(d.src.pile==='tab'&&d.src.pi===col)&&canTab(d.cards[0],col)){doMove(d.src,d.cards,'tab',col);ok=true}
  }
