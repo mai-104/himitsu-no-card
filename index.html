@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b2350">
+<title>秘密のカード</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--cw:50px;--ch:72px;--back:url(back1.webp)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;
+ font-family:"Hiragino Maru Gothic ProN","M PLUS Rounded 1c","Kosugi Maru","Noto Sans JP",system-ui,sans-serif;
+ -webkit-user-select:none;user-select:none}
+body{background:#2b2350;color:#fff}
+button{font:inherit;border:0;cursor:pointer}
+
+/* テーマ（選んだ背面に合わせて場の色を変える） */
+body.t0{--bgA:#9fd4f5;--bgB:#fbdbe8;--ink:#4a3550;--bar:rgba(255,255,255,.55);--btn:#fff;--btnInk:#b5527a;--slot:rgba(255,255,255,.7)}
+body.t1{--bgA:#120e30;--bgB:#33246a;--ink:#f3e9c4;--bar:rgba(10,8,30,.55);--btn:#3b2d78;--btnInk:#ffe8a3;--slot:rgba(255,232,163,.45)}
+body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:#eaffd0;--btnInk:#0b6a7d;--slot:rgba(220,255,180,.6)}
+
+.screen{position:fixed;inset:0;display:none;flex-direction:column;background:linear-gradient(160deg,var(--bgA),var(--bgB));color:var(--ink)}
+.screen.on{display:flex}
+
+/* タイトル */
+#title{align-items:center;overflow-y:auto;padding:28px 16px 24px}
+#title h1{margin:6px 0 2px;font-size:32px;letter-spacing:.08em;text-shadow:0 2px 8px rgba(0,0,0,.18)}
+#title .sub{font-size:13px;opacity:.8;margin-bottom:18px}
+.panel{width:100%;max-width:420px;background:var(--bar);border-radius:18px;padding:14px 14px 16px;margin-bottom:14px;backdrop-filter:blur(4px)}
+.panel h2{font-size:15px;margin:0 0 10px}
+.backs{display:flex;gap:12px;justify-content:center}
+.backs button{background:none;padding:4px;border-radius:12px;border:3px solid transparent;width:30%;max-width:100px}
+.backs button.sel{border-color:var(--btnInk);background:rgba(255,255,255,.25)}
+.backs img{width:100%;display:block;aspect-ratio:2/3;object-fit:fill}
+.backs span{display:block;font-size:12px;margin-top:4px;color:var(--ink)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:10px;border-radius:12px;background:rgba(255,255,255,.25);color:var(--ink);font-size:15px;border:2px solid transparent}
+.seg button.sel{background:var(--btn);color:var(--btnInk);border-color:var(--btnInk);font-weight:700}
+.big{display:block;width:100%;padding:14px;border-radius:14px;font-size:18px;font-weight:700;background:var(--btn);color:var(--btnInk);margin-top:10px;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.big.sub2{font-size:15px;padding:11px;background:rgba(255,255,255,.3);color:var(--ink);box-shadow:none}
+.big:disabled{opacity:.45}
+.howto{font-size:14px;line-height:1.7}
+.howto summary{font-weight:700;cursor:pointer}
+.credit{font-size:12px;opacity:.75;margin-top:6px;text-align:center}
+
+/* ゲーム画面 */
+#game{touch-action:none}
+.info{display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top) + 6px) 14px 4px;font-size:14px;font-weight:700}
+#board{position:relative;flex:1;overflow:hidden;touch-action:none}
+.bar{display:flex;gap:6px;padding:8px 8px calc(env(safe-area-inset-bottom) + 10px);background:var(--bar)}
+.bar button{flex:1;padding:10px 2px;border-radius:12px;background:var(--btn);color:var(--btnInk);font-size:14px;font-weight:700;line-height:1.2}
+.bar button small{display:block;font-size:18px}
+.bar button:disabled{opacity:.4}
+#autoBtn{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2000;padding:12px 22px;border-radius:30px;background:var(--btn);color:var(--btnInk);font-size:16px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.3);display:none}
+
+.slot{position:absolute;left:0;top:0;width:var(--cw);height:var(--ch);border:2px dashed var(--slot);border-radius:calc(var(--cw)*.12);
+ display:flex;align-items:center;justify-content:center;color:var(--slot);font-size:calc(var(--cw)*.42);font-weight:700}
+
+.card{position:absolute;left:0;top:0;width:var(--cw);height:var(--ch);transition:transform .17s ease;will-change:transform}
+.card.dragging{transition:none}
+.card .in{position:absolute;inset:0}
+.card .bk{position:absolute;inset:0;background:var(--back) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+.card .fc{position:absolute;inset:0;display:none;background:#fffdf7;border:1px solid #cdbfae;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden}
+.card.up .fc{display:block}
+.card.up .bk{display:none}
+.card.hint .fc{box-shadow:0 0 0 3px #ffd34d,0 1px 2px rgba(0,0,0,.3)}
+.red{color:#d63a5e}.blk{color:#2c2a4a}
+.cr{position:absolute;left:7%;top:3%;font-weight:800;font-size:calc(var(--cw)*.4);line-height:1;letter-spacing:-.06em}
+.cs{position:absolute;right:7%;top:5%;font-size:calc(var(--cw)*.32);line-height:1}
+.cb{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-size:calc(var(--cw)*.64);line-height:1}
+.shake .in{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* クリア */
+#win{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:3000}
+#win.on{display:flex}
+#win .box{background:var(--btn);color:var(--btnInk);border-radius:22px;padding:24px 22px;width:84%;max-width:340px;text-align:center}
+#win h2{margin:0 0 8px;font-size:28px}
+#win p{margin:4px 0 12px;font-size:15px}
+#win .big{background:var(--btnInk);color:var(--btn)}
+#win .big.sub2{background:rgba(0,0,0,.08);color:var(--btnInk)}
+.petal{position:fixed;top:-20px;z-index:2999;font-size:20px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body class="t0">
+
+<!-- タイトル画面 -->
+<section id="title" class="screen on">
+ <h1>秘密のカード</h1>
+ <div class="sub">（仮）ひとりで遊ぶトランプ</div>
+
+ <div class="panel">
+  <h2>カードの背面をえらぶ</h2>
+  <div class="backs" id="backs"></div>
+ </div>
+
+ <div class="panel">
+  <h2>クラシック ソリティア</h2>
+  <div class="seg" id="drawSeg">
+   <button data-d="1">1枚ずつめくる</button>
+   <button data-d="3">3枚ずつめくる</button>
+  </div>
+  <button class="big" id="contBtn" style="display:none">続きから</button>
+  <button class="big" id="startBtn">はじめから</button>
+ </div>
+
+ <div class="panel">
+  <h2>グループ分け ソリティア</h2>
+  <button class="big" disabled>じゅんび中</button>
+ </div>
+
+ <div class="panel howto">
+  <details>
+   <summary>遊び方（クラシック）</summary>
+   <p>右上の4つの場所に、マークごとに A→2→3…→K の順でカードを全部集めたらクリアです。</p>
+   <p>下の7列では、<b>赤と黒を交互</b>に、<b>数字が1つ小さいカード</b>を重ねられます。何枚か重なったまとまりも一緒に動かせます。</p>
+   <p>空いた列には K（または K から始まるまとまり）だけ置けます。</p>
+   <p>左上の山をタップするとカードがめくれます。山がなくなったらもう一度タップで、何回でも最初から回せます。</p>
+   <p>カードは<b>タップ</b>すると置ける場所へ自動で動きます。<b>ドラッグ</b>で好きな場所へ運ぶこともできます。</p>
+  </details>
+ </div>
+
+ <div class="credit">画像：ChatGPTで生成</div>
+</section>
+
+<!-- ゲーム画面 -->
+<section id="game" class="screen">
+ <div class="info"><span id="movesLbl">手数 0</span><span id="timeLbl">0:00</span></div>
+ <div id="board"><button id="autoBtn">おまかせで片付ける</button></div>
+ <div class="bar">
+  <button id="menuBtn"><small>≡</small>メニュー</button>
+  <button id="newBtn"><small>✦</small>新しく</button>
+  <button id="hintBtn"><small>？</small>ヒント</button>
+  <button id="undoBtn"><small>↶</small>もどす</button>
+ </div>
+</section>
+
+<div id="win"><div class="box">
+ <h2>クリア！</h2>
+ <p id="winTxt"></p>
+ <button class="big" id="againBtn">もう一度あそぶ</button>
+ <button class="big sub2" id="toMenuBtn">メニューへ</button>
+</div></div>
+
+<script>
+(()=>{
+const BACKS=[{f:'back1.webp',n:'桜',p:'🌸'},{f:'back2.webp',n:'星と月',p:'⭐'},{f:'back3.webp',n:'金魚',p:'🫧'}];
+const SUIT=['♠︎','♥︎','♦︎','♣︎'];
+const RANK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const isRed=s=>s===1||s===2;
+const $=id=>document.getElementById(id);
+
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function del(k){try{localStorage.removeItem(k)}catch(e){}}
+
+const pref=Object.assign({back:0,draw:1},load('hc_pref',{}));
+
+/* ---------- タイトル画面 ---------- */
+function applyBack(){
+ document.body.className='t'+pref.back;
+ document.documentElement.style.setProperty('--back',`url(${BACKS[pref.back].f})`);
+ [...$('backs').children].forEach((b,i)=>b.classList.toggle('sel',i===pref.back));
+}
+BACKS.forEach((b,i)=>{
+ const bt=document.createElement('button');
+ bt.innerHTML=`<img src="${b.f}" alt=""><span>${b.n}</span>`;
+ bt.onclick=()=>{pref.back=i;save('hc_pref',pref);applyBack()};
+ $('backs').appendChild(bt);
+});
+function applyDraw(){[...$('drawSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.d===pref.draw))}
+$('drawSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.draw=+b.dataset.d;save('hc_pref',pref);applyDraw()};
+applyBack();applyDraw();
+
+function refreshTitle(){
+ const s=load('hc_klondike',null);
+ $('contBtn').style.display=(s&&!s.won)?'block':'none';
+}
+refreshTitle();
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));if(id==='game')layout()}
+
+/* ---------- ゲーム本体 ---------- */
+let G=null, undo=[], busy=false;
+const board=$('board');
+const els=[]; const pos={};
+for(let id=0;id<52;id++){
+ const s=Math.floor(id/13), r=id%13+1;
+ const el=document.createElement('div');
+ el.className='card';
+ const c=isRed(s)?'red':'blk';
+ el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc ${c}"><span class="cr">${RANK[r]}</span><span class="cs">${SUIT[s]}</span><span class="cb">${SUIT[s]}</span></div></div>`;
+ board.appendChild(el); els[id]=el;
+}
+const slots={};
+function mkSlot(key,label){const d=document.createElement('div');d.className='slot';d.textContent=label;d.dataset.pile=key;board.appendChild(d);slots[key]=d}
+mkSlot('stock','↻');
+for(let i=0;i<4;i++)mkSlot('f'+i,'A');
+for(let i=0;i<7;i++)mkSlot('t'+i,'K');
+slots.stock.dataset.pile='stock';
+for(let i=0;i<4;i++){slots['f'+i].dataset.pile='found';slots['f'+i].dataset.pi=i}
+for(let i=0;i<7;i++){slots['t'+i].dataset.pile='tab';slots['t'+i].dataset.pi=i;slots['t'+i].dataset.idx=-1}
+
+function newGame(){
+ const deck=[];
+ for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({id:s*13+r-1,s,r,up:false});
+ for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
+ G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:pref.draw,started:false,won:false};
+ for(let i=0;i<7;i++)for(let j=0;j<=i;j++){const c=deck.pop();c.up=(j===i);G.tab[i].push(c)}
+ G.stock=deck;
+ undo=[];
+ persist();
+}
+function persist(){save('hc_klondike',G)}
+function snap(){undo.push(JSON.stringify({stock:G.stock,waste:G.waste,found:G.found,tab:G.tab,moves:G.moves}));if(undo.length>300)undo.shift()}
+function pileOf(p,i){return p==='tab'?G.tab[i]:p==='found'?G.found[i]:p==='waste'?G.waste:G.stock}
+
+/* レイアウト */
+let cw=50,ch=72,gap=4,offX=0,topY=8,tabTop=90,bw=0;
+function colX(i){return offX+gap+i*(cw+gap)}
+function layout(){
+ const W=board.clientWidth; bw=Math.min(W,560);
+ gap=Math.max(3,Math.round(bw*.013));
+ cw=Math.floor((bw-gap*8)/7); ch=Math.round(cw*1.48);
+ const maxCh=Math.floor((board.clientHeight-30)/4.2);
+ if(ch>maxCh){ch=maxCh;cw=Math.round(ch/1.48)}
+ offX=Math.round((W-(cw*7+gap*8))/2);
+ topY=gap+2; tabTop=topY+ch+gap*3;
+ const R=document.documentElement.style;
+ R.setProperty('--cw',cw+'px');R.setProperty('--ch',ch+'px');
+ const sp=(el,x,y)=>el.style.transform=`translate(${x}px,${y}px)`;
+ sp(slots.stock,colX(0),topY);
+ for(let i=0;i<4;i++)sp(slots['f'+i],colX(3+i),topY);
+ for(let i=0;i<7;i++)sp(slots['t'+i],colX(i),tabTop);
+ if(G)render();
+}
+addEventListener('resize',()=>{if($('game').classList.contains('on'))layout()});
+
+function colOffsets(col){
+ const avail=board.clientHeight-tabTop-8;
+ let dn=Math.round(ch*.13), upO=Math.round(ch*.3);
+ const d=col.filter(c=>!c.up).length, u=col.length-d;
+ const need=d*dn+Math.max(0,u-1)*upO+ch;
+ if(need>avail&&u>1){upO=Math.max(Math.round(ch*.16),Math.floor((avail-ch-d*dn)/(u-1)))}
+ if(d*dn+Math.max(0,u-1)*upO+ch>avail&&d>0){dn=Math.max(3,Math.floor((avail-ch-Math.max(0,u-1)*upO)/d))}
+ return {dn,upO};
+}
+function place(c,x,y,z,pile,pi,idx){
+ const el=els[c.id];
+ pos[c.id]={x,y};
+ el.style.transform=`translate(${x}px,${y}px)`;
+ el.style.zIndex=z;
+ el.classList.toggle('up',c.up);
+ el.dataset.pile=pile;el.dataset.pi=pi;el.dataset.idx=idx;
+}
+function render(){
+ G.stock.forEach((c,i)=>place(c,colX(0),topY,10+i,'stock',0,i));
+ const v=G.draw===3?3:1, n=G.waste.length;
+ G.waste.forEach((c,i)=>{const k=Math.max(0,i-(n-v));place(c,colX(1)+k*Math.round(cw*.3),topY,10+i,'waste',0,i)});
+ G.found.forEach((f,fi)=>f.forEach((c,i)=>place(c,colX(3+fi),topY,10+i,'found',fi,i)));
+ G.tab.forEach((col,ci)=>{
+  const {dn,upO}=colOffsets(col); let y=tabTop;
+  col.forEach((c,i)=>{place(c,colX(ci),y,100+i,'tab',ci,i);y+=c.up?upO:dn});
+ });
+ slots.stock.textContent=G.stock.length?'':(G.waste.length?'↻':'');
+ $('movesLbl').textContent='手数 '+G.moves;
+ $('undoBtn').disabled=!undo.length;
+ $('autoBtn').style.display=(!G.won&&canAutoFinish())?'block':'none';
+}
+
+/* ルール */
+function canFound(c,fi){const f=G.found[fi];return f.length?(f[f.length-1].s===c.s&&c.r===f[f.length-1].r+1):c.r===1}
+function canTab(c,ti){const col=G.tab[ti];if(!col.length)return c.r===13;const t=col[col.length-1];return t.up&&isRed(t.s)!==isRed(c.s)&&c.r===t.r-1}
+
+function doMove(src,cards,dest,di){
+ snap();
+ const from=pileOf(src.pile,src.pi);
+ from.splice(from.length-cards.length,cards.length);
+ const to=pileOf(dest,di);
+ cards.forEach(c=>to.push(c));
+ if(src.pile==='tab'&&from.length&&!from[from.length-1].up)from[from.length-1].up=true;
+ afterMove();
+}
+function afterMove(){
+ G.moves++; if(!G.started){G.started=true}
+ clearHint();
+ render(); persist();
+ if(G.found.every(f=>f.length===13))win();
+}
+
+function tapStock(){
+ if(G.stock.length){
+  snap();
+  const k=Math.min(G.draw,G.stock.length);
+  for(let i=0;i<k;i++){const c=G.stock.pop();c.up=true;G.waste.push(c)}
+  afterMove();
+ }else if(G.waste.length){
+  snap();
+  G.stock=G.waste.reverse().map(c=>(c.up=false,c)); G.waste=[];
+  afterMove();
+ }
+}
+
+function findTarget(src,cards){
+ const c=cards[0];
+ if(cards.length===1&&src.pile!=='found'){
+  for(let i=0;i<4;i++)if(canFound(c,i))return['found',i];
+ }
+ for(let i=0;i<7;i++){if(src.pile==='tab'&&src.pi===i)continue;if(G.tab[i].length&&canTab(c,i))return['tab',i]}
+ if(c.r===13&&!(src.pile==='tab'&&src.idx===0)){
+  for(let i=0;i<7;i++)if(!G.tab[i].length)return['tab',i];
+ }
+ return null;
+}
+function shake(cards){cards.forEach(c=>{const el=els[c.id];el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')})}
+
+/* ヒント */
+function clearHint(){document.querySelectorAll('.card.hint').forEach(e=>e.classList.remove('hint'))}
+function hint(){
+ clearHint();
+ const tries=[];
+ if(G.waste.length)tries.push({pile:'waste',pi:0,idx:G.waste.length-1,cards:[G.waste[G.waste.length-1]]});
+ G.tab.forEach((col,ci)=>col.forEach((c,i)=>{if(c.up)tries.push({pile:'tab',pi:ci,idx:i,cards:col.slice(i)})}));
+ for(const t of tries){
+  const tg=findTarget(t,t.cards);
+  if(!tg)continue;
+  if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&t.cards[0].r===13&&!G.tab[tg[1]].length&&G.tab[t.pi][t.idx-1].up)continue;
+  if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&G.tab[t.pi][t.idx-1].up){const p=G.tab[t.pi][t.idx-1];if(isRed(p.s)!==isRed(t.cards[0].s)&&p.r===t.cards[0].r+1)continue}
+  t.cards.forEach(c=>els[c.id].classList.add('hint'));return;
+ }
+ if(G.stock.length||G.waste.length){const top=G.stock[G.stock.length-1];if(top){els[top.id].classList.add('hint');shake([top])}else shake([])}
+}
+
+/* 自動で片付け */
+function canAutoFinish(){return !G.stock.length&&!G.waste.length&&G.tab.some(c=>c.length)&&G.tab.every(col=>col.every(c=>c.up))}
+function autoFinish(){
+ if(busy)return; busy=true; snap(); $('autoBtn').style.display='none';
+ const step=()=>{
+  let best=null;
+  G.tab.forEach((col,ci)=>{if(!col.length)return;const c=col[col.length-1];for(let i=0;i<4;i++)if(canFound(c,i)&&(!best||c.r<best.c.r))best={c,ci,fi:i}});
+  if(!best){busy=false;render();return}
+  G.tab[best.ci].pop();G.found[best.fi].push(best.c);G.moves++;
+  render();
+  if(G.found.every(f=>f.length===13)){busy=false;persist();win();return}
+  setTimeout(step,110);
+ };
+ step();
+}
+
+/* 操作（タップとドラッグ） */
+let drag=null;
+board.addEventListener('pointerdown',e=>{
+ if(busy||!G||G.won)return;
+ const t=e.target.closest('[data-pile]'); if(!t)return;
+ const p=t.dataset.pile;
+ if(p==='stock'){tapStock();return}
+ if(!t.classList.contains('card'))return;
+ const pi=+t.dataset.pi, idx=+t.dataset.idx, list=pileOf(p,pi), c=list[idx];
+ if(!c||!c.up)return;
+ if(p!=='tab'&&idx!==list.length-1)return;
+ const cards=p==='tab'?list.slice(idx):[c];
+ drag={src:{pile:p,pi,idx},cards,sx:e.clientX,sy:e.clientY,moved:false};
+ e.preventDefault();
+});
+addEventListener('pointermove',e=>{
+ if(!drag)return;
+ const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
+ if(!drag.moved&&Math.hypot(dx,dy)<8)return;
+ if(!drag.moved){drag.moved=true;drag.cards.forEach((c,i)=>{const el=els[c.id];el.classList.add('dragging');el.style.zIndex=1000+i})}
+ drag.dx=dx;drag.dy=dy;
+ drag.cards.forEach(c=>{const p=pos[c.id];els[c.id].style.transform=`translate(${p.x+dx}px,${p.y+dy}px)`});
+});
+function endDrag(e){
+ if(!drag)return;
+ const d=drag; drag=null;
+ d.cards.forEach(c=>els[c.id].classList.remove('dragging'));
+ if(!d.moved){
+  const tg=findTarget(d.src,d.cards);
+  if(tg)doMove(d.src,d.cards,tg[0],tg[1]);else shake(d.cards);
+  return;
+ }
+ const p0=pos[d.cards[0].id];
+ const cx=p0.x+d.dx+cw/2, cy=p0.y+d.dy+ch/2;
+ const col=Math.max(0,Math.min(6,Math.floor((cx-offX-gap/2)/(cw+gap))));
+ let ok=false;
+ if(cy<tabTop-ch*.15){
+  if(col>=3&&d.cards.length===1&&d.src.pile!=='found'&&canFound(d.cards[0],col-3)){doMove(d.src,d.cards,'found',col-3);ok=true}
+ }else{
+  if(!(d.src.pile==='tab'&&d.src.pi===col)&&canTab(d.cards[0],col)){doMove(d.src,d.cards,'tab',col);ok=true}
+ }
+ if(!ok)render();
+}
+addEventListener('pointerup',endDrag);
+addEventListener('pointercancel',endDrag);
+
+/* 時間 */
+setInterval(()=>{
+ if(!G||G.won||!G.started||document.hidden||!$('game').classList.contains('on'))return;
+ G.time++; $('timeLbl').textContent=fmt(G.time);
+ if(G.time%5===0)persist();
+},1000);
+function fmt(t){return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')}
+
+/* クリア */
+function win(){
+ G.won=true; del('hc_klondike');
+ $('winTxt').textContent=`手数 ${G.moves}　／　時間 ${fmt(G.time)}`;
+ $('win').classList.add('on');
+ const p=BACKS[pref.back].p;
+ for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';s.textContent=p;s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
+}
+
+/* ボタン */
+function startNew(){newGame();$('timeLbl').textContent='0:00';show('game')}
+$('startBtn').onclick=startNew;
+$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;undo=[];$('timeLbl').textContent=fmt(G.time);show('game')};
+$('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
+$('newBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
+$('undoBtn').onclick=()=>{if(busy||!undo.length)return;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();render();persist()};
+$('hintBtn').onclick=()=>{if(!busy&&G)hint()};
+$('autoBtn').onclick=autoFinish;
+$('againBtn').onclick=()=>{$('win').classList.remove('on');newGame();$('timeLbl').textContent='0:00';layout()};
+$('toMenuBtn').onclick=()=>{$('win').classList.remove('on');refreshTitle();show('title')};
+
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+})();
+</script>
+</body>
+</html>
