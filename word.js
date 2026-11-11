@@ -30,8 +30,8 @@ const WORDS=[
 ];
 /* モードの設定（数字を変えるだけで調整できる） */
 const MODES={
- n:{name:'ふつう',groups:10,per:5,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
- h:{name:'むずかしい',groups:12,per:6,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
+ n:{name:'ふつう',groups:12,per:5,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
+ h:{name:'むずかしい',groups:14,per:6,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
 };
 const NSLOT=4, NCOL=5, NEED=5;
 
