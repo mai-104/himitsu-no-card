@@ -48,8 +48,25 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 /* ゲーム画面 */
 #game{touch-action:none}
 #bgc{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-#game>.info,#game>#board,#game>.bar{position:relative;z-index:1}
-.info{display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top) + 6px) 14px 4px;font-size:14px;font-weight:700}
+#game>.tools,#game>.info,#game>#board,#game>.bar{position:relative;z-index:1}
+.tools{display:flex;align-items:center;gap:5px;padding:calc(env(safe-area-inset-top) + 8px) 10px 0}
+.tools .sp{flex:1}
+.tb{width:38px;height:38px;border-radius:10px;font-size:19px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.18);padding:0}
+.tb.used{display:none}
+.tb:disabled{opacity:.4}
+.tb.menu{background:var(--btn);color:var(--btnInk);font-size:22px}
+.tb.hint{background:#ffcf6b;color:#7a4a00}
+.tb.shuf{background:#7cc4ff;color:#0b3d6b}
+.tb.undo{background:#8fe0a0;color:#11522a}
+#pauseLbl{position:absolute;left:50%;top:78%;white-space:nowrap;transform:translate(-50%,-50%);z-index:1500;background:var(--bar);color:var(--ink);padding:14px 22px;border-radius:16px;font-size:16px;font-weight:700;text-align:center;display:none;pointer-events:none;backdrop-filter:blur(4px)}
+#pauseLbl small{display:block;font-size:12px;font-weight:400;margin-top:4px}
+#sheet{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
+#sheet.on{display:flex}
+#sheet .box{background:var(--btn);color:var(--btnInk);border-radius:20px;padding:18px;width:88%;max-width:380px;max-height:80vh;overflow-y:auto;font-size:14px;line-height:1.7}
+#sheet h3{margin:0 0 6px;font-size:17px}
+#sheet .seg button{background:rgba(0,0,0,.06);color:var(--btnInk)}
+#sheet .big{background:var(--btnInk);color:var(--btn)}
+.info{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 2px;font-size:14px;font-weight:700}
 #board{position:relative;flex:1;overflow:hidden;touch-action:none}
 .bar{display:flex;gap:6px;padding:8px 8px calc(env(safe-area-inset-bottom) + 10px);background:var(--bar)}
 .bar button{flex:1;padding:10px 2px;border-radius:12px;background:var(--btn);color:var(--btnInk);font-size:14px;font-weight:700;line-height:1.2}
@@ -126,7 +143,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
    <p>下の7列では、<b>赤と黒を交互</b>に、<b>数字が1つ小さいカード</b>を重ねられます。何枚か重なったまとまりも一緒に動かせます。</p>
    <p>空いた列には K（または K から始まるまとまり）だけ置けます。</p>
    <p>右上の山をタップするとカードがめくれます。山がなくなったらもう一度タップで、何回でも最初から回せます。</p>
-   <p>カードを<b>1回タップ</b>すると下の列の置ける場所へ、<b>2回タップ</b>すると左上の置き場へ動きます。<b>ドラッグ</b>で好きな場所へ運ぶこともできます。</p>
+   <p>カードを<b>1回タップ</b>すると下の列の置ける場所へ、<b>2回タップ</b>すると左上の置き場へ動きます（Aも2回タップ）。<b>ドラッグ</b>で好きな場所へ運ぶこともできます。</p>
   </details>
  </div>
 
@@ -136,16 +153,36 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 <!-- ゲーム画面 -->
 <section id="game" class="screen">
  <canvas id="bgc"></canvas>
- <div class="info"><span id="movesLbl">手数 0</span><span id="timeLbl">0:00</span></div>
- <div id="board"><button id="autoBtn">おまかせで片付ける</button></div>
+ <div class="tools">
+  <button class="tb menu" id="sheetBtn" aria-label="メニュー">≡</button>
+  <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
+  <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
+  <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
+  <span class="sp"></span>
+  <button class="tb shuf" data-k="shuf" aria-label="シャッフル">🔀</button>
+  <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
+  <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
+  <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
+ </div>
+ <div class="info"><span id="movesLbl">0手</span><span id="timeLbl">0:00</span></div>
+ <div id="board"><button id="autoBtn">おまかせで片付ける</button><div id="pauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
-  <button id="menuBtn"><small>≡</small>メニュー</button>
-  <button id="newBtn"><small>✦</small>新しく</button>
-  <button id="hintBtn"><small>？</small>ヒント</button>
-  <button id="undoBtn"><small>↶</small>もどす</button>
+  <button id="menuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
+  <button id="pauseBtn"><small>⏸</small>一時停止</button>
+  <button id="newBtn"><small>✦</small>NEW</button>
  </div>
 </section>
 
+<div id="sheet"><div class="box">
+ <h3>遊び方</h3>
+ <div id="sheetHow"></div>
+ <h3 style="margin-top:12px">ボタン</h3>
+ <p>💡 ヒント（3回）　🔀 シャッフル（1回）　↶ ひとつ戻る（3回）<br>使ったボタンは消えます。</p>
+ <p>🔀 シャッフルは、場と山の<b>伏せてあるカードだけ</b>を混ぜ直します。表のカードと置き場のカードはそのままです。</p>
+ <h3 style="margin-top:12px">背景の動き</h3>
+ <div class="seg" id="animSeg2"><button data-a="1">動かす</button><button data-a="0">止める</button></div>
+ <button class="big" id="sheetClose">ゲームにもどる</button>
+</div></div>
 <div id="win"><div class="box">
  <h2>クリア！</h2>
  <p id="winTxt"></p>
@@ -315,7 +352,7 @@ function newGame(){
  const deck=[];
  for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({id:s*13+r-1,s,r,up:false});
  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
- G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:pref.draw,started:false,won:false};
+ G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:pref.draw,started:false,won:false,hint:3,undo:3,shuf:1};
  for(let i=0;i<7;i++)for(let j=0;j<=i;j++){const c=deck.pop();c.up=(j===i);G.tab[i].push(c)}
  G.stock=deck;
  undo=[];
@@ -370,8 +407,8 @@ function render(){
   col.forEach((c,i)=>{place(c,colX(ci),y,100+i,'tab',ci,i);y+=c.up?upO:dn});
  });
  slots.stock.textContent=G.stock.length?'':(G.waste.length?'↻':'');
- $('movesLbl').textContent='手数 '+G.moves;
- $('undoBtn').disabled=!undo.length;
+ $('movesLbl').textContent=G.moves+'手';
+ renderTools();
  $('autoBtn').style.display='none';
  if(autoArmed&&!busy&&!G.won&&canAutoFinish()){autoArmed=false;busy=true;setTimeout(()=>{busy=false;autoFinish()},350)}
 }
@@ -443,6 +480,38 @@ function onTap(src,cards){
  }
  if(tg)doMove(src,cards,tg[0],tg[1]);else shake(cards);
 }
+/* 上のボタン（回数つき） */
+function left(k){return G[k]==null?(k==='shuf'?1:3):G[k]}
+function renderTools(){
+ ['hint','undo','shuf'].forEach(k=>{
+  const bs=[...document.querySelectorAll('.tb[data-k='+k+']')], n=left(k);
+  bs.forEach((b,i)=>{b.classList.toggle('used',i>=n);if(k==='undo')b.disabled=!undo.length});
+ });
+}
+function useTool(k){G[k]=left(k)-1;renderTools();persist()}
+document.querySelector('.tools').addEventListener('click',e=>{
+ const b=e.target.closest('.tb[data-k]'); if(!b||busy||!G||G.won||left(b.dataset.k)<=0)return;
+ resume();
+ const k=b.dataset.k;
+ if(k==='hint'){if(hint())useTool('hint')}
+ if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');render();persist()}
+ if(k==='shuf'){shuffleDown();useTool('shuf')}
+});
+function shuffleDown(){
+ const pool=[];
+ G.tab.forEach(col=>col.forEach(c=>{if(!c.up)pool.push(c)}));
+ G.stock.forEach(c=>pool.push(c));
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ let k=0;
+ G.tab.forEach(col=>col.forEach((c,i)=>{if(!c.up)col[i]=pool[k++]}));
+ G.stock=G.stock.map(()=>pool[k++]);
+ undo=[]; // 混ぜる前には戻れない
+ clearHint(); render(); persist();
+}
+/* 一時停止 */
+let paused=false;
+function setPause(v){paused=v;$('pauseLbl').style.display=v?'block':'none';$('pauseBtn').innerHTML=v?'<small>▶</small>再開':'<small>⏸</small>一時停止'}
+function resume(){if(paused)setPause(false)}
 /* ヒント */
 function clearHint(){document.querySelectorAll('.card.hint').forEach(e=>e.classList.remove('hint'))}
 function hint(){
@@ -455,9 +524,12 @@ function hint(){
   if(!tg)continue;
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&t.cards[0].r===13&&!G.tab[tg[1]].length&&G.tab[t.pi][t.idx-1].up)continue;
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&G.tab[t.pi][t.idx-1].up){const p=G.tab[t.pi][t.idx-1];if(isRed(p.s)!==isRed(t.cards[0].s)&&p.r===t.cards[0].r+1)continue}
-  t.cards.forEach(c=>els[c.id].classList.add('hint'));return;
+  t.cards.forEach(c=>els[c.id].classList.add('hint'));return true;
  }
- if(G.stock.length||G.waste.length){const top=G.stock[G.stock.length-1];if(top){els[top.id].classList.add('hint');shake([top])}else shake([])}
+ const top=G.stock[G.stock.length-1];
+ if(top){els[top.id].classList.add('hint');shake([top]);return true}
+ if(G.waste.length){slots.stock.animate([{transform:slots.stock.style.transform+' scale(1.15)'},{transform:slots.stock.style.transform}],{duration:400});return true}
+ return false;
 }
 
 /* 自動で片付け */
@@ -481,6 +553,7 @@ let drag=null;
 board.addEventListener('pointerdown',e=>{
  if(busy||!G||G.won)return;
  const t=e.target.closest('[data-pile]'); if(!t)return;
+ resume();
  const p=t.dataset.pile;
  if(p==='stock'){tapStock();return}
  if(!t.classList.contains('card'))return;
@@ -523,7 +596,7 @@ addEventListener('pointercancel',endDrag);
 
 /* 時間 */
 setInterval(()=>{
- if(!G||G.won||!G.started||document.hidden||!$('game').classList.contains('on'))return;
+ if(!G||G.won||!G.started||paused||document.hidden||!$('game').classList.contains('on'))return;
  G.time++; $('timeLbl').textContent=fmt(G.time);
  if(G.time%5===0)persist();
 },1000);
@@ -539,15 +612,18 @@ function win(){
 }
 
 /* ボタン */
-function startNew(){newGame();$('timeLbl').textContent='0:00';show('game')}
+function startNew(){setPause(false);newGame();$('timeLbl').textContent='0:00';show('game')}
 $('startBtn').onclick=startNew;
-$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;undo=[];$('timeLbl').textContent=fmt(G.time);show('game')};
+$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game')};
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
-$('newBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
-$('undoBtn').onclick=()=>{if(busy||!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();render();persist()};
-$('hintBtn').onclick=()=>{if(!busy&&G)hint()};
+$('newBtn').onclick=()=>{setPause(false);if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
+$('pauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
+$('sheetBtn').onclick=()=>{$('sheetHow').innerHTML=document.querySelector('.howto details').innerHTML.replace(/<summary>.*?<\/summary>/,'');syncAnim2();$('sheet').classList.add('on')};
+$('sheetClose').onclick=()=>$('sheet').classList.remove('on');
+function syncAnim2(){[...$('animSeg2').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}
+$('animSeg2').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.anim=+b.dataset.a;save('hc_pref',pref);syncAnim2();applyAnim();BG.start()};
 $('autoBtn').onclick=autoFinish;
-$('againBtn').onclick=()=>{$('win').classList.remove('on');newGame();$('timeLbl').textContent='0:00';layout()};
+$('againBtn').onclick=()=>{setPause(false);$('win').classList.remove('on');newGame();$('timeLbl').textContent='0:00';layout()};
 $('toMenuBtn').onclick=()=>{$('win').classList.remove('on');refreshTitle();show('title')};
 
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
