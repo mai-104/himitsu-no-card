@@ -231,7 +231,7 @@ BACKS.forEach((b,i)=>{
  $('backs').appendChild(bt);
 });
 function applyDraw(){[...$('drawSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.d===pref.draw))}
-$('drawSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.draw=+b.dataset.d;save('hc_pref',pref);applyDraw()};
+$('drawSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.draw=+b.dataset.d;save('hc_pref',pref);applyDraw();refreshTitle()};
 function applyAnim(){[...$('animSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}
 $('animSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.anim=+b.dataset.a;save('hc_pref',pref);applyAnim()};
 applyBack();applyDraw();applyAnim();
@@ -239,6 +239,9 @@ applyBack();applyDraw();applyAnim();
 function refreshTitle(){
  const s=load('hc_klondike',null);
  $('contBtn').style.display=(s&&!s.won)?'block':'none';
+ const diff=!!(s&&(s.draw||1)!==pref.draw);
+ $('contBtn').disabled=diff;
+ $('contBtn').textContent=diff?`続きから（${s.draw||1}枚ずつめくるで保存中）`:'続きから';
 }
 refreshTitle();
 

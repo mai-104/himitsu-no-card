@@ -154,7 +154,7 @@ function layout(){
  gap=Math.max(4,Math.round(bw*.014));
  cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.7);
  offX=Math.round((W-(cw*NCOL+gap*(NCOL+1)))/2);
- y0=gap; yW=y0+ch+gap; os=Math.round(ch*.42); tabTop=y0+ch+NEED*os+gap*3;
+ y0=gap; yW=y0+ch+gap; os=0; tabTop=yW+ch+gap*2;
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
@@ -186,7 +186,7 @@ function render(){
   slotEls[si].style.visibility=s?'hidden':'visible';
   if(!s)return;
   place({id:s.title,up:true},colX(si),y0,10,'slot',si,0);vis.add(s.title);
-  s.names.forEach((id,i)=>{place({id,up:true},colX(si),y0+(i+1)*os,11+i,'slotn',si,i);vis.add(id)});
+  s.names.forEach((id,i)=>{place({id,up:true},colX(si),yW,11+i,'slotn',si,i);vis.add(id)});
   els[s.title].querySelector('.lb').textContent=`${s.names.length} / ${NEED}`;
  });
  renderDone();
