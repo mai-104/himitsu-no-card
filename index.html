@@ -485,7 +485,8 @@ function left(k){return G[k]==null?(k==='shuf'?1:3):G[k]}
 function renderTools(){
  ['hint','undo','shuf'].forEach(k=>{
   const bs=[...document.querySelectorAll('.tb[data-k='+k+']')], n=left(k);
-  bs.forEach((b,i)=>{b.classList.toggle('used',i>=n);if(k==='undo')b.disabled=!undo.length});
+  const off=k==='undo'?!undo.length:k==='hint'?!findHint():false;
+  bs.forEach((b,i)=>{b.classList.toggle('used',i>=n);b.disabled=off});
  });
 }
 function useTool(k){G[k]=left(k)-1;renderTools();persist()}
@@ -514,8 +515,7 @@ function setPause(v){paused=v;$('pauseLbl').style.display=v?'block':'none';$('pa
 function resume(){if(paused)setPause(false)}
 /* ヒント */
 function clearHint(){document.querySelectorAll('.card.hint').forEach(e=>e.classList.remove('hint'))}
-function hint(){
- clearHint();
+function findHint(){
  const tries=[];
  if(G.waste.length)tries.push({pile:'waste',pi:0,idx:G.waste.length-1,cards:[G.waste[G.waste.length-1]]});
  G.tab.forEach((col,ci)=>col.forEach((c,i)=>{if(c.up)tries.push({pile:'tab',pi:ci,idx:i,cards:col.slice(i)})}));
@@ -524,12 +524,15 @@ function hint(){
   if(!tg)continue;
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&t.cards[0].r===13&&!G.tab[tg[1]].length&&G.tab[t.pi][t.idx-1].up)continue;
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&G.tab[t.pi][t.idx-1].up){const p=G.tab[t.pi][t.idx-1];if(isRed(p.s)!==isRed(t.cards[0].s)&&p.r===t.cards[0].r+1)continue}
-  t.cards.forEach(c=>els[c.id].classList.add('hint'));return true;
+  if(t.pile==='tab'&&tg[0]==='tab'&&t.idx===0&&t.cards[0].r===13&&!G.tab[tg[1]].length)continue;
+  return t.cards;
  }
- const top=G.stock[G.stock.length-1];
- if(top){els[top.id].classList.add('hint');shake([top]);return true}
- if(G.waste.length){slots.stock.animate([{transform:slots.stock.style.transform+' scale(1.15)'},{transform:slots.stock.style.transform}],{duration:400});return true}
- return false;
+ return null;
+}
+function hint(){
+ clearHint();
+ const cards=findHint(); if(!cards)return false;
+ cards.forEach(c=>els[c.id].classList.add('hint'));return true;
 }
 
 /* 自動で片付け */
