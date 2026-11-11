@@ -5,28 +5,28 @@ const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet}=window.HC;
 /* ---------- 仮置きのグループ（あとで差し替え） ---------- */
 const WORDS=[
  {t:'果物',w:['りんご','みかん','ぶどう','もも','バナナ']},
- {t:'野菜',w:['にんじん','キャベツ','たまねぎ','ピーマン','だいこん']},
+ {t:'野菜',w:['にんじん','キャベツ','玉ねぎ','ピーマン','大根']},
  {t:'動物園',w:['ライオン','ゾウ','キリン','パンダ','ゴリラ']},
  {t:'水族館',w:['イルカ','クラゲ','ラッコ','マンボウ','ウミガメ']},
  {t:'鳥',w:['スズメ','カラス','ツバメ','フクロウ','インコ']},
  {t:'虫',w:['カブトムシ','チョウ','トンボ','セミ','テントウムシ']},
  {t:'花',w:['ひまわり','チューリップ','バラ','アサガオ','タンポポ']},
- {t:'天気',w:['はれ','くもり','あめ','ゆき','かみなり']},
- {t:'乗り物',w:['でんしゃ','バス','ひこうき','じてんしゃ','ふね']},
+ {t:'天気',w:['晴れ','くもり','雨','雪','雷']},
+ {t:'乗り物',w:['電車','バス','飛行機','自転車','船']},
  {t:'スイーツ',w:['プリン','ショートケーキ','パフェ','シュークリーム','ドーナツ']},
  {t:'楽器',w:['ピアノ','ギター','バイオリン','たいこ','トランペット']},
- {t:'文房具',w:['えんぴつ','けしゴム','じょうぎ','ホッチキス','のり']},
+ {t:'文房具',w:['えんぴつ','消しゴム','じょうぎ','ホッチキス','のり']},
  {t:'調理道具',w:['フライパン','ボウル','おたま','まな板','ほうちょう']},
- {t:'スポーツ',w:['サッカー','やきゅう','テニス','すいえい','バスケットボール']},
- {t:'仕事',w:['いしゃ','パイロット','けいさつかん','しょうぼうし','だいく']},
+ {t:'スポーツ',w:['サッカー','野球','テニス','水泳','バスケットボール']},
+ {t:'仕事',w:['医者','パイロット','警察官','消防士','大工']},
  {t:'宝石',w:['ダイヤモンド','ルビー','サファイア','エメラルド','しんじゅ']},
  {t:'星座',w:['おひつじ座','ふたご座','しし座','さそり座','うお座']},
- {t:'体の部分',w:['め','みみ','くち','ひざ','かた']},
- {t:'家具',w:['ソファ','ベッド','たんす','テーブル','ほんだな']},
+ {t:'体の部分',w:['目','耳','口','手','足']},
+ {t:'家具',w:['ソファ','ベッド','たんす','テーブル','本だな']},
  {t:'イベント',w:['お正月','節分','成人式','誕生日','クリスマス']},
  {t:'レストラン',w:['ナポリタン','オムライス','ハンバーグ','カレーライス','グラタン']},
- {t:'本屋',w:['えほん','まんが','ずかん','じしょ','ざっし']},
- {t:'学校',w:['こくご','さんすう','りか','しゃかい','おんがく']},
+ {t:'本屋',w:['絵本','まんが','ずかん','辞書','雑誌']},
+ {t:'学校',w:['国語','算数','理科','社会','音楽']},
 ];
 /* モードの設定（数字を変えるだけで調整できる） */
 const MODES={
@@ -61,6 +61,10 @@ const css=`
 body.t0{--tapeA:#ff9fbf;--tapeB:rgba(255,255,255,.55)}
 body.t1{--tapeA:#2c3f8f;--tapeB:rgba(255,215,120,.6)}
 body.t2{--tapeA:#59c4ee;--tapeB:rgba(210,255,150,.6)}
+#wDone{position:absolute;left:0;right:0;bottom:6px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:0 6px;z-index:5;pointer-events:none}
+#wDone .chip{background:linear-gradient(180deg,#fff2c4,#ffd98a);border:1px solid #d9a640;color:#6b3e00;border-radius:8px;font-size:12px;font-weight:800;padding:5px 2px;text-align:center;white-space:nowrap;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.25);animation:pop .4s ease}
+#wDone .chip::before{content:"✓ ";color:#2f9a4a}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 #wwin{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:3000}
 #wwin.on{display:flex}
 #wwin .box{background:var(--btn);color:var(--btnInk);border-radius:22px;padding:24px 22px;width:84%;max-width:340px;text-align:center}
@@ -83,7 +87,7 @@ sec.innerHTML=`
   <span id="wUndos"></span>
  </div>
  <div class="info"><span id="wMoves">0手</span><span id="wTime">0:00</span></div>
- <div id="wboard" style="position:relative;flex:1;overflow:hidden;touch-action:none"><div id="wPauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
+ <div id="wboard" style="position:relative;flex:1;overflow:hidden;touch-action:none"><div id="wDone"></div><div id="wPauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
   <button id="wMenuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
   <button id="wPauseBtn"><small>⏸</small>一時停止</button>
@@ -117,13 +121,13 @@ function newGame(mode){
   for(let k=0;k<up;k++)col.push({id:deck.pop(),up:true});
   tab.push(col);
  }
- G={mode,cards,groups:pick.length,stock:deck.map(id=>({id,up:false})),waste:[],slots:[null,null,null,null],tab,done:0,
+ G={mode,cards,groups:pick.length,stock:deck.map(id=>({id,up:false})),waste:[],slots:[null,null,null,null],tab,done:0,cleared:[],
     moves:0,time:0,started:false,won:false,hint:M.hint,shuf:M.shuf,undo:M.undo};
  undo=[];
  buildEls(); persist();
 }
 function persist(){if(G)save(key(G.mode),G)}
-function snap(){undo.push(JSON.stringify({stock:G.stock,waste:G.waste,slots:G.slots,tab:G.tab,done:G.done,moves:G.moves}));if(undo.length>300)undo.shift()}
+function snap(){undo.push(JSON.stringify({stock:G.stock,waste:G.waste,slots:G.slots,tab:G.tab,done:G.done,cleared:G.cleared,moves:G.moves}));if(undo.length>300)undo.shift()}
 
 /* ---------- カードの見た目 ---------- */
 function buildEls(){
@@ -142,7 +146,7 @@ function buildEls(){
 const slotEls={};
 
 /* ---------- レイアウト ---------- */
-let cw=70,ch=46,gap=5,offX=0,y0=6,yW=60,tabTop=120;
+let cw=70,ch=46,gap=5,offX=0,y0=6,yW=60,tabTop=120,os=20;
 const colX=i=>offX+gap+i*(cw+gap);
 function layout(){
  if(!G)return;
@@ -150,22 +154,28 @@ function layout(){
  gap=Math.max(4,Math.round(bw*.014));
  cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.7);
  offX=Math.round((W-(cw*NCOL+gap*(NCOL+1)))/2);
- y0=gap; yW=y0+ch+gap; tabTop=yW+ch+gap*2;
+ y0=gap; yW=y0+ch+gap; os=Math.round(ch*.42); tabTop=y0+ch+NEED*os+gap*3;
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
  G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].length;wd.style.fontSize=Math.min(ch*.3,(cw*.92)/Math.max(len,2.2))+'px'});
  render();
 }
+function renderDone(){
+ const box=$('wDone'),list=G.cleared||[];
+ if(box.childElementCount!==list.length){
+  box.innerHTML='';list.forEach(t=>{const d=document.createElement('div');d.className='chip';d.style.width=cw+'px';d.textContent=t;box.appendChild(d)});
+ }
+}
 function colOff(col){
- const avail=board.clientHeight-tabTop-6; let o=Math.round(ch*.55);
+ const avail=board.clientHeight-tabTop-8-$('wDone').offsetHeight; let o=Math.round(ch*.55);
  if(col.length>1&&(col.length-1)*o+ch>avail)o=Math.max(8,Math.floor((avail-ch)/(col.length-1)));
  return o;
 }
 function place(p,x,y,z,pile,pi,idx){
  const el=els[p.id]; pos[p.id]={x,y};
  el.style.transform=`translate(${x}px,${y}px)`;el.style.zIndex=z;
- el.classList.toggle('up',p.up);
+ el.classList.toggle('up',p.up);el.classList.remove('tape');
  el.dataset.pile=pile;el.dataset.pi=pi;el.dataset.idx=idx;
 }
 function render(){
@@ -175,10 +185,11 @@ function render(){
  G.slots.forEach((s,si)=>{
   slotEls[si].style.visibility=s?'hidden':'visible';
   if(!s)return;
-  s.names.forEach((id,i)=>{place({id,up:true},colX(si),y0,10+i,'slotn',si,i);vis.add(id)});
-  place({id:s.title,up:true},colX(si),y0,30,'slot',si,0);vis.add(s.title);
+  place({id:s.title,up:true},colX(si),y0,10,'slot',si,0);vis.add(s.title);
+  s.names.forEach((id,i)=>{place({id,up:true},colX(si),y0+(i+1)*os,11+i,'slotn',si,i);vis.add(id)});
   els[s.title].querySelector('.lb').textContent=`${s.names.length} / ${NEED}`;
  });
+ renderDone();
  G.tab.forEach((col,ci)=>{
   const o=colOff(col); let y=tabTop;
   col.forEach((p,i)=>{
@@ -247,7 +258,7 @@ function completeSlot(si){
  [s.title,...s.names].forEach(id=>{const e=els[id];e.classList.add('gone');e.style.transform+=' scale(1.25)'});
  setTimeout(()=>{
   [s.title,...s.names].forEach(id=>{els[id].classList.remove('gone')});
-  G.slots[si]=null;G.done++;busy=false;
+  (G.cleared=G.cleared||[]).push(CARD[s.title].label);G.slots[si]=null;G.done++;busy=false;
   render();persist();
   if(G.done===G.groups)winGame();
  },380);
