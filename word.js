@@ -1,6 +1,6 @@
 /* 秘密のカード：グループ分けソリティア（試作） */
 (()=>{
-const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet}=window.HC;
+const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch}=window.HC;
 
 /* ---------- 仮置きのグループ（あとで差し替え） ---------- */
 const WORDS=[
@@ -123,7 +123,7 @@ function newGame(mode){
  }
  G={mode,cards,groups:pick.length,stock:deck.map(id=>({id,up:false})),waste:[],slots:[null,null,null,null],tab,done:0,cleared:[],
     moves:0,time:0,started:false,won:false,hint:M.hint,shuf:M.shuf,undo:M.undo};
- undo=[];
+ undo=[];watch.reset();
  buildEls(); persist();
 }
 function persist(){if(G)save(key(G.mode),G)}
@@ -251,7 +251,7 @@ function doMove(src,run,dest,di){
  G.moves++;G.started=true;clearHint();
  const s=dest==='slot'?G.slots[di]:null;
  render();persist();
- if(s&&s.names.length===NEED)completeSlot(di);
+ if(s&&s.names.length===NEED)completeSlot(di);else watch.real();
 }
 function completeSlot(si){
  const s=G.slots[si]; busy=true;
@@ -260,15 +260,49 @@ function completeSlot(si){
   [s.title,...s.names].forEach(id=>{els[id].classList.remove('gone')});
   (G.cleared=G.cleared||[]).push(CARD[s.title].label);G.slots[si]=null;G.done++;busy=false;
   render();persist();
-  if(G.done===G.groups)winGame();
+  if(G.done===G.groups)winGame();else watch.real();
  },380);
 }
 function tapStock(){
+ let rec=false;
  if(G.stock.length){snap();const p=G.stock.pop();p.up=true;G.waste.push(p)}
- else if(G.waste.length){snap();G.stock=G.waste.reverse().map(p=>(p.up=false,p));G.waste=[]}
+ else if(G.waste.length){snap();G.stock=G.waste.reverse().map(p=>(p.up=false,p));G.waste=[];rec=true}
  else return;
  G.moves++;G.started=true;clearHint();render();persist();
+ watch.draw(rec);
 }
+/* どこかに置けるカードがあるか（山のカードも全部調べる） */
+function anyMove(){
+ const empty=G.tab.some(c=>!c.length);
+ const fits=p=>{const r=[p];if(slotFor(r)>=0)return true;if(empty)return true;for(let i=0;i<NCOL;i++){const col=G.tab[i];if(col.length&&canTab(r,i))return true}return false};
+ for(const p of G.stock)if(fits(p))return true;
+ for(const p of G.waste)if(fits(p))return true;
+ for(let ci=0;ci<NCOL;ci++){
+  const col=G.tab[ci];
+  for(let i=0;i<col.length;i++){
+   const run=runAt(col,i); if(!run||(i>0&&runAt(col,i-1)))continue;
+   if(slotFor(run)>=0)return true;
+   for(let t=0;t<NCOL;t++){
+    if(t===ci)continue;
+    const tc=G.tab[t];
+    if(tc.length?canTab(run,t):i>0)return true;   // 同じグループに重ねる／空いた列へ（下にカードがあるときだけ）
+   }
+  }
+ }
+ return false;
+}
+function doShuffle(){
+ const pool=[];G.tab.forEach(col=>col.forEach(p=>{if(!p.up)pool.push(p.id)}));G.stock.forEach(p=>pool.push(p.id));
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ let n=0;G.tab.forEach(col=>col.forEach(p=>{if(!p.up)p.id=pool[n++]}));G.stock.forEach(p=>p.id=pool[n++]);
+ undo=[];clearHint();useTool('shuf');render();persist();watch.reset();watch.check();
+}
+const watch=makeWatch({
+ anyMove,total:()=>G.stock.length+G.waste.length,
+ hintsLeft:()=>left('hint'),shufLeft:()=>left('shuf'),
+ doShuffle,
+ doNew:()=>{setPause(false);newGame(G.mode);$('wTime').textContent='0:00';layout()}
+});
 function shake(run){run.forEach(p=>{const e=els[p.id];e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')})}
 
 /* タップ：1回で下の列、2回で上の置き場 */
@@ -317,13 +351,8 @@ sec.querySelector('.tools').addEventListener('click',e=>{
  const b=e.target.closest('.tb[data-k]');if(!b||busy||!G||G.won||left(b.dataset.k)<=0)return;
  resume();const k=b.dataset.k;
  if(k==='hint'){const r=findHint();if(!r)return;clearHint();r.forEach(p=>els[p.id].classList.add('hint'));useTool('hint')}
- if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');render();persist()}
- if(k==='shuf'){
-  const pool=[];G.tab.forEach(col=>col.forEach(p=>{if(!p.up)pool.push(p.id)}));G.stock.forEach(p=>pool.push(p.id));
-  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
-  let n=0;G.tab.forEach(col=>col.forEach(p=>{if(!p.up)p.id=pool[n++]}));G.stock.forEach(p=>p.id=pool[n++]);
-  undo=[];clearHint();useTool('shuf');render();persist();
- }
+ if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');render();persist();watch.reset()}
+ if(k==='shuf')doShuffle();
 });
 
 /* ---------- 操作 ---------- */
@@ -389,7 +418,7 @@ function refreshTitle(){
 $('wModeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;wMode=b.dataset.m;save('hc_wmode',wMode);refreshTitle()};
 function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';show('wgame')}
 $('wStartBtn').onclick=start;
-$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame')};
+$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame')};
 $('wMenuBtn').onclick=()=>{persist();show('title')};
 $('wPauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
 $('wNewBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;setPause(false);newGame(G?G.mode:wMode);$('wTime').textContent='0:00';layout()};

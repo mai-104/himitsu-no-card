@@ -60,6 +60,14 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 .tb.undo{background:#8fe0a0;color:#11522a}
 #pauseLbl{position:absolute;left:50%;top:78%;white-space:nowrap;transform:translate(-50%,-50%);z-index:1500;background:var(--bar);color:var(--ink);padding:14px 22px;border-radius:16px;font-size:16px;font-weight:700;text-align:center;display:none;pointer-events:none;backdrop-filter:blur(4px)}
 #pauseLbl small{display:block;font-size:12px;font-weight:400;margin-top:4px}
+#stuck{position:fixed;inset:0;z-index:3100;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
+#stuck.on{display:flex}
+#stuck .box{background:var(--btn);color:var(--btnInk);border-radius:20px;padding:22px 18px 16px;width:84%;max-width:340px;text-align:center}
+#stuck p{white-space:pre-line;margin:0 0 14px;font-size:16px;font-weight:700;line-height:1.6}
+#stuck .big{background:var(--btnInk);color:var(--btn)}
+#stuck .big.sub2{background:rgba(0,0,0,.08);color:var(--btnInk)}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 96px);transform:translate(-50%,20px);opacity:0;z-index:2900;background:var(--btn);color:var(--btnInk);padding:11px 18px;border-radius:22px;font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.3);transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 #sheet{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
 #sheet.on{display:flex}
 #sheet .box{background:var(--btn);color:var(--btnInk);border-radius:20px;padding:18px;width:88%;max-width:380px;max-height:80vh;overflow-y:auto;font-size:14px;line-height:1.7}
@@ -123,10 +131,6 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 
  <div class="panel">
   <h2>クラシック ソリティア</h2>
-  <div class="seg" id="drawSeg">
-   <button data-d="1">1枚ずつめくる</button>
-   <button data-d="3">3枚ずつめくる</button>
-  </div>
   <button class="big" id="contBtn" style="display:none">続きから</button>
   <button class="big" id="startBtn">はじめから</button>
  </div>
@@ -188,6 +192,8 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  </div>
 </section>
 
+<div id="stuck"><div class="box"><p id="stuckTxt"></p><div id="stuckBtns"></div></div></div>
+<div id="toast"></div>
 <div id="sheet"><div class="box">
  <h3>遊び方</h3>
  <div id="sheetHow"></div>
@@ -231,18 +237,14 @@ BACKS.forEach((b,i)=>{
  bt.onclick=()=>{pref.back=i;save('hc_pref',pref);applyBack()};
  $('backs').appendChild(bt);
 });
-function applyDraw(){[...$('drawSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.d===pref.draw))}
-$('drawSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.draw=+b.dataset.d;save('hc_pref',pref);applyDraw();refreshTitle()};
+
 function applyAnim(){[...$('animSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}
 $('animSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.anim=+b.dataset.a;save('hc_pref',pref);applyAnim()};
-applyBack();applyDraw();applyAnim();
+applyBack();applyAnim();
 
 function refreshTitle(){
  const s=load('hc_klondike',null);
  $('contBtn').style.display=(s&&!s.won)?'block':'none';
- const diff=!!(s&&(s.draw||1)!==pref.draw);
- $('contBtn').disabled=diff;
- $('contBtn').textContent=diff?`続きから（${s.draw||1}枚ずつめくるで保存中）`:'続きから';
 }
 refreshTitle();
 
@@ -370,10 +372,11 @@ function newGame(){
  const deck=[];
  for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({id:s*13+r-1,s,r,up:false});
  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
- G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:pref.draw,started:false,won:false,hint:3,undo:3,shuf:1};
+ G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:1,started:false,won:false,hint:3,undo:3,shuf:1};
  for(let i=0;i<7;i++)for(let j=0;j<=i;j++){const c=deck.pop();c.up=(j===i);G.tab[i].push(c)}
  G.stock=deck;
  undo=[];
+ watch.reset();
  persist();
 }
 function persist(){save('hc_klondike',G)}
@@ -444,26 +447,59 @@ function doMove(src,cards,dest,di){
  if(src.pile==='tab'&&from.length&&!from[from.length-1].up)from[from.length-1].up=true;
  afterMove();
 }
-function afterMove(){
+function afterMove(fromStock){
  autoArmed=true;
  G.moves++; if(!G.started){G.started=true}
  clearHint();
  render(); persist();
- if(G.found.every(f=>f.length===13))win();
+ if(G.found.every(f=>f.length===13)){win();return}
+ if(!fromStock&&!G.won)watch.real();
 }
 
 function tapStock(){
  if(G.stock.length){
   snap();
-  const k=Math.min(G.draw,G.stock.length);
-  for(let i=0;i<k;i++){const c=G.stock.pop();c.up=true;G.waste.push(c)}
-  afterMove();
+  const c=G.stock.pop();c.up=true;G.waste.push(c);
+  afterMove(true);watch.draw(false);
  }else if(G.waste.length){
   snap();
   G.stock=G.waste.reverse().map(c=>(c.up=false,c)); G.waste=[];
-  afterMove();
+  afterMove(true);watch.draw(true);
  }
 }
+/* どこかに置けるカードがあるか（山のカードも全部調べる） */
+function anyMove(){
+ const fits=c=>{for(let i=0;i<4;i++)if(canFound(c,i))return true;for(let i=0;i<7;i++){const col=G.tab[i];if(col.length?canTab(c,i):c.r===13)return true}return false};
+ for(const c of G.stock)if(fits(c))return true;
+ for(const c of G.waste)if(fits(c))return true;
+ const pool=[...G.stock,...G.waste];
+ for(let ci=0;ci<7;ci++){
+  const col=G.tab[ci];
+  for(let i=0;i<col.length;i++){
+   if(!col[i].up)continue;
+   const run=col.slice(i), c=run[0];
+   if(run.length===1){for(let f=0;f<4;f++)if(canFound(c,f))return true}
+   for(let t=0;t<7;t++){
+    if(t===ci)continue;
+    const tc=G.tab[t];
+    if(tc.length?canTab(c,t):c.r===13){
+     if(i===0){if(tc.length)return true;continue}        // 列がまるごと空く
+     const below=col[i-1];
+     if(!below.up)return true;                           // 伏せカードが開く
+     for(let f=0;f<4;f++)if(canFound(below,f))return true;
+     if(pool.some(p=>isRed(p.s)!==isRed(below.s)&&p.r===below.r-1))return true;
+    }
+   }
+  }
+ }
+ return false;
+}
+const watch=makeWatch({
+ anyMove,total:()=>G.stock.length+G.waste.length,
+ hintsLeft:()=>left('hint'),shufLeft:()=>left('shuf'),
+ doShuffle:()=>{shuffleDown();useTool('shuf');watch.reset();watch.check()},
+ doNew:()=>{setPause(false);newGame();$('timeLbl').textContent='0:00';layout()}
+});
 
 function foundTarget(src,cards){
  if(cards.length!==1||src.pile==='found')return null;
@@ -513,8 +549,8 @@ document.querySelector('.tools').addEventListener('click',e=>{
  resume();
  const k=b.dataset.k;
  if(k==='hint'){if(hint())useTool('hint')}
- if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');render();persist()}
- if(k==='shuf'){shuffleDown();useTool('shuf')}
+ if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');render();persist();watch.reset()}
+ if(k==='shuf'){shuffleDown();useTool('shuf');watch.reset();watch.check()}
 });
 function shuffleDown(){
  const pool=[];
@@ -635,7 +671,7 @@ function win(){
 /* ボタン */
 function startNew(){setPause(false);newGame();$('timeLbl').textContent='0:00';show('game')}
 $('startBtn').onclick=startNew;
-$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game')};
+$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;G.draw=1;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game')};
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
 $('newBtn').onclick=()=>{setPause(false);if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
 $('pauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
@@ -648,7 +684,44 @@ $('autoBtn').onclick=autoFinish;
 $('againBtn').onclick=()=>{setPause(false);$('win').classList.remove('on');newGame();$('timeLbl').textContent='0:00';layout()};
 $('toMenuBtn').onclick=()=>{$('win').classList.remove('on');refreshTitle();show('title')};
 
-window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,openSheet};
+function dialog(text,btns){
+ $('stuckTxt').textContent=text;const b=$('stuckBtns');b.innerHTML='';
+ btns.forEach(([lb,fn],i)=>{const e=document.createElement('button');e.className='big'+(i?' sub2':'');e.textContent=lb;e.onclick=()=>{$('stuck').classList.remove('on');fn()};b.appendChild(e)});
+ $('stuck').classList.add('on');
+}
+let toastTm=0;
+function toast(text){const t=$('toast');t.textContent=text;t.classList.add('on');clearTimeout(toastTm);toastTm=setTimeout(()=>t.classList.remove('on'),3200)}
+/* 進めないかどうかの見張り（両方のゲームで共通） */
+function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuffle(), doNew()
+ let stuckDraws=-1, cycles=0, nudged=false;
+ const W={
+  real(){cycles=0;nudged=false;W.check()},          // 山以外でカードを動かしたとき
+  check(){
+   if(o.anyMove()){stuckDraws=-1;return}
+   if(stuckDraws<0)stuckDraws=0;
+   if(o.total()===0)W.fire();
+  },
+  draw(recycled){                                    // 山をタップしたとき
+   if(recycled)cycles++;
+   if(o.anyMove()){
+    stuckDraws=-1;
+    if(cycles>=2&&!nudged&&o.hintsLeft()>0){nudged=true;toast('ヒントも使えるよ!!')}
+    return;
+   }
+   if(stuckDraws<0){stuckDraws=0;return}
+   stuckDraws++;
+   if(stuckDraws>o.total())W.fire();
+  },
+  fire(){
+   stuckDraws=-1;
+   if(o.shufLeft()>0)dialog('これ以上進めないみたい。\nシャッフルしてみる？',[['シャッフルする',o.doShuffle],['タイトルへ戻る',()=>show('title')]]);
+   else dialog('残念だけど、ここまでみたい。\nNEWゲームで始める？',[['NEWで始める',o.doNew],['タイトルへ戻る',()=>show('title')]]);
+  },
+  reset(){stuckDraws=-1;cycles=0;nudged=false}
+ };
+ return W;
+}
+window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch};
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 })();
 </script>
