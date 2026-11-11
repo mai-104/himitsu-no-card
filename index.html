@@ -424,24 +424,25 @@ function tabTarget(src,cards){
  return null;
 }
 function findTarget(src,cards){return foundTarget(src,cards)||tabTarget(src,cards)}
-let tapWait=null;
+let tapWait=null, lastTap={id:-1,t:0};
+const DBL=450;
 function onTap(src,cards){
- const id=cards[0].id;
- if(tapWait&&tapWait.id===id){ // 2回目のタップ → 上の置き場へ
-  clearTimeout(tapWait.tm); tapWait=null;
+ const id=cards[0].id, now=performance.now();
+ const isDouble=lastTap.id===id&&now-lastTap.t<700;
+ lastTap={id,t:now};
+ if(tapWait){clearTimeout(tapWait.tm);tapWait=null}
+ if(isDouble){ // 2回目のタップ → 上の置き場へ（1回目で場に動いていても上へ）
+  lastTap={id:-1,t:0};
   const f=foundTarget(src,cards); if(f)doMove(src,cards,f[0],f[1]);else shake(cards);
   return;
  }
- if(tapWait){clearTimeout(tapWait.tm);tapWait=null}
  const tg=tabTarget(src,cards);
- if(foundTarget(src,cards)){ // 2回目を少し待つ
-  tapWait={id,tm:setTimeout(()=>{tapWait=null;if(tg)doMove(src,cards,tg[0],tg[1])},300)};
+ if(foundTarget(src,cards)){ // 2回目を待つ
+  if(tg)tapWait={tm:setTimeout(()=>{tapWait=null;doMove(src,cards,tg[0],tg[1])},DBL)};
   return;
  }
  if(tg)doMove(src,cards,tg[0],tg[1]);else shake(cards);
 }
-function shake(cards){cards.forEach(c=>{const el=els[c.id];el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')})}
-
 /* ヒント */
 function clearHint(){document.querySelectorAll('.card.hint').forEach(e=>e.classList.remove('hint'))}
 function hint(){
