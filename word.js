@@ -191,7 +191,7 @@ const IMG={
  '十二時の鐘':'kane12',
  '灰':'hai',
 };
-const BAND=.3;   // カードの上の名前の帯（カードの高さに対する割合）
+const BAND=.25;   // カードの上の名前の帯（カードの高さに対する割合）
 
 /* ---------- 画面（HTML） ---------- */
 const css=`
@@ -202,9 +202,9 @@ const css=`
 #wgame .wcard .fc{position:absolute;inset:0;display:none;background:#F7EED9;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
 #wgame .wcard.up .fc{display:block}
 #wgame .wcard.up .bk{display:none}
-#wgame .wcard .pic{position:absolute;left:0;right:0;bottom:0;top:30%;background:center/cover no-repeat}
+#wgame .wcard .pic{position:absolute;left:0;right:0;bottom:0;top:25%;background:center/cover no-repeat}
 #wgame .wcard .pic::before{content:"";position:absolute;left:0;right:0;top:0;height:22%;background:linear-gradient(#F7EED9,rgba(247,238,217,0))}
-#wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:30%;display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
+#wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:25%;display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
 #wgame .wcard.ttl .fc{background:linear-gradient(180deg,#fff2c4,#ffd98a);border-color:#d9a640;color:#6b3e00}
 #wgame .wcard.ttl .wd{font-weight:800}
 #wgame .wcard .lb{position:absolute;left:0;right:0;bottom:8%;text-align:center;font-size:calc(var(--wh)*.2);opacity:.75;font-weight:700}
@@ -332,7 +332,7 @@ function layout(){
  gap=Math.max(4,Math.round(bw*.014));
  cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.8);   // 横5:縦4
  offX=Math.round((W-(cw*NCOL+gap*(NCOL+1)))/2);
- y0=gap; yW=y0+ch+gap; os=Math.round(ch*.4); tabTop=yW+(NEED-2)*os+ch+gap*2; // 置き場は4枚まで下に並ぶ
+ y0=gap; yW=y0+ch+gap; os=Math.round(ch*(BAND+.06)); tabTop=yW+(NEED-2)*os+ch+gap*2; // 置き場は4枚まで下に並ぶ
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
@@ -346,7 +346,7 @@ function renderDone(){
  }
 }
 function colOff(col){
- const avail=board.clientHeight-tabTop-8-$('wDone').offsetHeight; let o=Math.round(ch*.42);
+ const avail=board.clientHeight-tabTop-8-$('wDone').offsetHeight; let o=Math.round(ch*(BAND+.07));
  if(col.length>1&&(col.length-1)*o+ch>avail)o=Math.max(8,Math.floor((avail-ch)/(col.length-1)));
  return o;
 }
