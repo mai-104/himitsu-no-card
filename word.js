@@ -141,6 +141,7 @@ const IMG={
  'かさじぞう':'kasajizo',
  '浦島太郎':'urashima',
  'かぐや姫':'kaguya',
+ '桃太郎':'momotaro',
  'オオカミ':'ookami',
  'おばあさん':'obaasan',
  'かご':'kago',
