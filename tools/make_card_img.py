@@ -11,7 +11,7 @@ for y in range(int(H * .1), int(H * .6)):
     d = statistics.mean(sum(abs(a - b) for a, b in zip(px[x, y], top)) for x in range(0, W, 9))
     if d > 60: start = y; break
 art = im.crop((0, start, W, H)); aw, ah = art.size
-TW, TH = 500, 280                      # 5 : 2.8
+TW, TH = 500, 280                      # 5 : 2.8（上の帯の大きさに合わせてゲーム側で少し切る）
 r = max(TW / aw, TH / ah)
 art = art.resize((round(aw * r), round(ah * r)), Image.LANCZOS)
 x0 = (art.width - TW) // 2; y0 = (art.height - TH) // 2
