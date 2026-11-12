@@ -141,6 +141,23 @@ const IMG={
  'かさじぞう':'kasajizo',
  '浦島太郎':'urashima',
  'かぐや姫':'kaguya',
+ 'オオカミ':'ookami',
+ 'おばあさん':'obaasan',
+ 'かご':'kago',
+ '猟師':'ryoushi',
+ 'お花畑':'ohanabatake',
+ '森':'mori',
+ '七人の小人':'kobito',
+ '毒りんご':'dokuringo',
+ '魔法の鏡':'kagami',
+ 'お妃':'okisaki',
+ 'ガラスの棺':'hitsugi',
+ 'ガラスの靴':'kutsu',
+ 'かぼちゃの馬車':'basha',
+ '魔法使い':'mahoutsukai',
+ '舞踏会':'butoukai',
+ '十二時の鐘':'kane12',
+ '灰':'hai',
 };
 const BAND=.3;   // カードの上の名前の帯（カードの高さに対する割合）
 
