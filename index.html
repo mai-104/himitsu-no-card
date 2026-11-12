@@ -710,7 +710,8 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
    }
    if(stuckDraws<0){stuckDraws=0;return}
    stuckDraws++;
-   if(stuckDraws>o.total())W.fire();
+   // 山を1周以上見たあと、めくったカードが全部山に戻った瞬間に出す（シャッフルで全部混ざるように）
+   if(recycled&&stuckDraws>o.total())W.fire();
   },
   fire(){
    stuckDraws=-1;
