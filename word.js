@@ -123,7 +123,7 @@ const MODES={
  h:{name:'むずかしい',groups:14,per:6,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
 };
 const NSLOT=4, NCOL=5, NEED=5;
-/* カードの絵（言葉 → img/のファイル名）。tools/make_card_img.py で作って、ここに1行足す */
+/* カードの絵（言葉 → img/のファイル名。同じ言葉が別テーマにもあるときは 'テーマ/言葉' で指定）。tools/make_card_img.py で作って、ここに1行足す */
 const IMG={
  'ヘンゼルとグレーテル':'hansel',
  '人魚姫':'ningyo',
@@ -142,6 +142,23 @@ const IMG={
  '浦島太郎':'urashima',
  'かぐや姫':'kaguya',
  '桃太郎':'momotaro',
+ 'きびだんご':'kibidango',
+ 'キジ':'kiji',
+ '桃太郎/猿':'saru_momo',
+ '桃太郎/犬':'inu_momo',
+ '鬼ヶ島':'onigashima',
+ '鬼':'oni',
+ '大きな桃':'ookinamomo',
+ '竹':'take',
+ '月の使者':'tsukinoshisha',
+ '天の羽衣':'hagoromo',
+ '竹取の翁':'okina',
+ '五つの難題':'nandai',
+ '亀':'kame',
+ '竜宮城':'ryuguu',
+ '乙姫':'otohime',
+ '玉手箱':'tamatebako',
+ '白い煙':'shiroikemuri',
  'オオカミ':'ookami',
  'おばあさん':'obaasan',
  'かご':'kago',
@@ -282,7 +299,8 @@ function buildEls(){
   CARD[c.id]=c;
   const el=document.createElement('div');
   el.className='wcard'+(c.t?' ttl':'');
-  const pic=!c.t&&IMG[c.label]?`<div class="pic" style="background-image:url(img/${IMG[c.label]}.webp)"></div>`:'';
+  const im=c.t?null:(IMG[WORDS[c.g].t+'/'+c.label]||(WORDS.some((x,i)=>i!==c.g&&x.w.includes(c.label))?null:IMG[c.label]));
+  const pic=im?`<div class="pic" style="background-image:url(img/${im}.webp)"></div>`:'';
   el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc">${pic}<div class="wd">${c.label}</div>${c.t?'<div class="lb">タイトル</div>':''}</div></div>`;
   board.appendChild(el); els[c.id]=el;
  });
