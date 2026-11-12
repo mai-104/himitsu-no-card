@@ -57,7 +57,7 @@ const WORDS=[ /* i:1 = イラストのカード（絵はあとで入れる） */
  {t:'音楽',w:['クラシック','ジャズ','ロック','ポップス','演歌','ヒップホップ']},
  {t:'ミステリー',w:['アリバイ','容疑者','証拠','矛盾','密室','名探偵','動機']},
  {t:'金属',w:['金','銀','銅','鉄','アルミ','プラチナ','チタン']},
- {t:'童話',w:['人魚姫','赤ずきん','シンデレラ','白雪姫','はだかのおうさま','ヘンゼルとグレーテル','うさぎとかめ','ねむり姫']},
+ {t:'童話',i:1,w:['人魚姫','赤ずきん','シンデレラ','白雪姫','はだかのおうさま','ヘンゼルとグレーテル','うさぎとかめ','ねむり姫']},
  {t:'昔話',w:['金太郎','一寸法師','花咲かじいさん','さるかに合戦','鶴の恩返し','かさじぞう','浦島太郎','かぐや姫']},
  {t:'赤ずきん',i:1,w:['オオカミ','おばあさん','かご','猟師','お花畑','森']},
  {t:'白雪姫',i:1,w:['七人の小人','毒りんご','魔法の鏡','お妃','ガラスの棺']},
@@ -123,6 +123,12 @@ const MODES={
  h:{name:'むずかしい',groups:14,per:6,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
 };
 const NSLOT=4, NCOL=5, NEED=5;
+/* カードの絵（言葉 → img/のファイル名）。tools/make_card_img.py で作って、ここに1行足す */
+const IMG={
+ 'ヘンゼルとグレーテル':'hansel',
+ '人魚姫':'ningyo',
+};
+const BAND=.3;   // カードの上の名前の帯（カードの高さに対する割合）
 
 /* ---------- 画面（HTML） ---------- */
 const css=`
@@ -130,17 +136,19 @@ const css=`
 #wgame .wcard.dragging{transition:none}
 #wgame .wcard .in{position:absolute;inset:0}
 #wgame .wcard .bk{position:absolute;left:50%;top:50%;width:var(--wh);height:var(--ww);transform:translate(-50%,-50%) rotate(90deg);background:var(--back) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
-#wgame .wcard .fc{position:absolute;inset:0;display:none;background:#fffdf7;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
+#wgame .wcard .fc{position:absolute;inset:0;display:none;background:#F7EED9;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
 #wgame .wcard.up .fc{display:block}
 #wgame .wcard.up .bk{display:none}
-#wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:calc(var(--wh)*.46);display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
+#wgame .wcard .pic{position:absolute;left:0;right:0;bottom:0;top:30%;background:center/cover no-repeat}
+#wgame .wcard .pic::before{content:"";position:absolute;left:0;right:0;top:0;height:22%;background:linear-gradient(#F7EED9,rgba(247,238,217,0))}
+#wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:30%;display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
 #wgame .wcard.ttl .fc{background:linear-gradient(180deg,#fff2c4,#ffd98a);border-color:#d9a640;color:#6b3e00}
 #wgame .wcard.ttl .wd{font-weight:800}
 #wgame .wcard .lb{position:absolute;left:0;right:0;bottom:8%;text-align:center;font-size:calc(var(--wh)*.2);opacity:.75;font-weight:700}
 #wgame .wcard.hint .fc{box-shadow:0 0 0 3px #ffd34d,0 1px 2px rgba(0,0,0,.3)}
 #wgame .wcard.shake .in{animation:shake .3s}
 #wgame .wcard.gone{transition:transform .35s ease,opacity .35s ease;opacity:0}
-#wgame .wslot{position:absolute;left:0;top:0;width:var(--ww);height:var(--wh);border:2px dashed var(--slot);border-radius:calc(var(--wh)*.14);display:flex;align-items:center;justify-content:center;color:var(--slot);font-size:calc(var(--wh)*.24);font-weight:700;text-align:center;line-height:1.2}
+#wgame .wslot{position:absolute;left:0;top:0;width:var(--ww);height:var(--wh);border:2px dashed var(--slot);border-radius:calc(var(--wh)*.14);display:flex;align-items:center;justify-content:center;color:var(--slot);font-size:calc(var(--ww)*.15);font-weight:700;text-align:center;line-height:1.2}
 /* マスキングテープ（同じグループがつながったとき） */
 #wgame .wcard.tape::before,#wgame .wcard.tape::after{content:"";position:absolute;top:calc(var(--wh)*-.13);width:calc(var(--ww)*.13);height:calc(var(--wh)*.36);z-index:2;
  background-color:var(--tapeA);background-image:linear-gradient(90deg,var(--tapeB) 50%,transparent 50%),linear-gradient(var(--tapeB) 50%,transparent 50%);background-size:6px 6px;opacity:.5;
@@ -242,7 +250,8 @@ function buildEls(){
   CARD[c.id]=c;
   const el=document.createElement('div');
   el.className='wcard'+(c.t?' ttl':'');
-  el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc"><div class="wd">${c.label}</div>${c.t?'<div class="lb">タイトル</div>':''}</div></div>`;
+  const pic=!c.t&&IMG[c.label]?`<div class="pic" style="background-image:url(img/${IMG[c.label]}.webp)"></div>`:'';
+  el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc">${pic}<div class="wd">${c.label}</div>${c.t?'<div class="lb">タイトル</div>':''}</div></div>`;
   board.appendChild(el); els[c.id]=el;
  });
  for(let i=0;i<NSLOT;i++){const d=document.createElement('div');d.className='wslot';d.dataset.pile='slot';d.dataset.pi=i;d.textContent='タイトルを\n置く';d.style.whiteSpace='pre';board.appendChild(d);slotEls[i]=d}
@@ -257,13 +266,13 @@ function layout(){
  if(!G)return;
  const W=board.clientWidth, H=board.clientHeight, bw=Math.min(W,600);
  gap=Math.max(4,Math.round(bw*.014));
- cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.7);
+ cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.8);   // 横5:縦4
  offX=Math.round((W-(cw*NCOL+gap*(NCOL+1)))/2);
- y0=gap; yW=y0+ch+gap; os=Math.round(ch*.45); tabTop=yW+(NEED-2)*os+ch+gap*2; // 置き場は4枚まで下に並ぶ
+ y0=gap; yW=y0+ch+gap; os=Math.round(ch*.4); tabTop=yW+(NEED-2)*os+ch+gap*2; // 置き場は4枚まで下に並ぶ
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
- G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].length;wd.style.fontSize=Math.min(ch*.3,(cw*.92)/Math.max(len,2.2))+'px'});
+ G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].length;wd.style.fontSize=Math.min(ch*BAND*.82,(cw*.92)/Math.max(len,2.2))+'px'});
  render();
 }
 function renderDone(){
@@ -273,7 +282,7 @@ function renderDone(){
  }
 }
 function colOff(col){
- const avail=board.clientHeight-tabTop-8-$('wDone').offsetHeight; let o=Math.round(ch*.55);
+ const avail=board.clientHeight-tabTop-8-$('wDone').offsetHeight; let o=Math.round(ch*.42);
  if(col.length>1&&(col.length-1)*o+ch>avail)o=Math.max(8,Math.floor((avail-ch)/(col.length-1)));
  return o;
 }
