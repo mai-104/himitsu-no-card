@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>効果音の試聴</title>
+<style>
+body{margin:0;padding:16px;background:linear-gradient(#cdeaff,#fff3e3);min-height:100vh;font-family:"Hiragino Maru Gothic ProN","Noto Sans JP",sans-serif;color:#4a4060}
+h1{font-size:20px;margin:4px 0 4px}
+p.note{font-size:13px;margin:0 0 14px;opacity:.8}
+h2{font-size:15px;margin:18px 0 8px}
+.item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.item button{flex:none;width:52px;height:52px;border-radius:50%;border:0;background:#7fd1b8;color:#fff;font-size:22px;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.item button:active{transform:scale(.94)}
+.t{font-weight:700;font-size:15px}
+.d{font-size:12px;opacity:.75;margin-top:2px}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;margin-left:6px;vertical-align:1px}
+.both{background:#d6f2e8;color:#2f7d66}.word{background:#ffe2d9;color:#b0563c}.classic{background:#e3e0ff;color:#5a4cae}
+</style>
+</head>
+<body>
+<h1>効果音の試聴（マリン作）</h1>
+<p class="note">ボタンを押すと音が鳴ります。音が出ないときは、スマホのマナーモードと音量を確かめてください。</p>
+<div id="list"></div>
+<script src="sfx.js"></script>
+<script>
+const L=[
+ ['いつも鳴る音',[
+  ['flip','山からカードをめくる','ぺらっ（紙をめくる音）','both'],
+  ['recycle','めくったカードを山に戻す','しゅっ（まとめる音）','both'],
+  ['place','カードを下の列に置く','ことっ（やさしく置く音）','both'],
+  ['found','カードを上の置き場に置く','ぽん（少し明るい音）','both'],
+  ['ng','置けない場所に動かした','こつこつ（小さく低い音）','both'],
+  ['reveal','伏せたカードが表になる','ふわっ（小さな音）','both'],
+ ]],
+ ['うれしい場面',[
+  ['title','タイトルを置き場に置く','ちりん（鈴）','word'],
+  ['group','グループがそろう／マークが K までそろう','きらきら（短い和音）','both'],
+  ['clear','クリア','短いファンファーレ','both'],
+ ]],
+ ['ボタン・お知らせ',[
+  ['shuffle','シャッフル','しゃらしゃら（混ぜる音）','both'],
+  ['hint','ヒント','ぴこっ','both'],
+  ['undo','ひとつ戻る','しゅるっ（巻き戻す音）','both'],
+  ['pause','一時停止・再開','かちっ（小さなクリック）','both'],
+  ['stuck','進めないお知らせ','ぽろん（やさしい下がる音）','both'],
+  ['nudge','「ヒントも使えるよ!!」','ぴろん（軽い上がる音）','both'],
+ ]],
+];
+const TAG={both:['両方','both'],word:['グループ分けだけ','word'],classic:['クラシックだけ','classic']};
+const box=document.getElementById('list');
+L.forEach(([h,items])=>{
+ box.insertAdjacentHTML('beforeend',`<h2>${h}</h2>`);
+ items.forEach(([k,t,d,g])=>{
+  box.insertAdjacentHTML('beforeend',`<div class="item"><button data-k="${k}">▶</button><div><div class="t">${t}<span class="tag ${TAG[g][1]}">${TAG[g][0]}</span></div><div class="d">${d}</div></div></div>`);
+ });
+});
+box.addEventListener('click',e=>{const b=e.target.closest('button');if(b)SFX.play(b.dataset.k)});
+</script>
+</body>
+</html>
