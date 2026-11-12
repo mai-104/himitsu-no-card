@@ -127,6 +127,12 @@ const NSLOT=4, NCOL=5, NEED=5;
 const IMG={
  'ヘンゼルとグレーテル':'hansel',
  '人魚姫':'ningyo',
+ '赤ずきん':'akazukin',
+ 'シンデレラ':'cinderella',
+ '白雪姫':'shirayuki',
+ 'はだかのおうさま':'hadaka',
+ 'うさぎとかめ':'usagikame',
+ 'ねむり姫':'nemuri',
 };
 const BAND=.3;   // カードの上の名前の帯（カードの高さに対する割合）
 
