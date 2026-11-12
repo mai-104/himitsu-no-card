@@ -222,7 +222,7 @@ const css=`
 #wgame .wcard{position:absolute;left:0;top:0;width:var(--ww);height:var(--wh);transition:transform .17s ease;will-change:transform}
 #wgame .wcard.dragging{transition:none}
 #wgame .wcard .in{position:absolute;inset:0}
-#wgame .wcard .bk{position:absolute;left:50%;top:50%;width:var(--wh);height:var(--ww);transform:translate(-50%,-50%) rotate(90deg);background:var(--back) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+#wgame .wcard .bk{position:absolute;inset:0;box-sizing:border-box;border:2px solid #fff;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 3px rgba(0,0,0,.25);background:linear-gradient(90deg,#a8e2cf 50%,transparent 50%) 0 0/calc(var(--ww)*.22) calc(var(--ww)*.22),linear-gradient(#a8e2cf 50%,transparent 50%) 0 0/calc(var(--ww)*.22) calc(var(--ww)*.22),#FCF8EE;background-blend-mode:multiply,multiply,normal}
 #wgame .wcard .fc{position:absolute;inset:0;display:none;background:#F7EED9;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
 #wgame .wcard.up .fc{display:block}
 #wgame .wcard.up .bk{display:none}
@@ -245,6 +245,8 @@ const css=`
 body.t0{--tapeA:#ff9fbf;--tapeB:rgba(255,255,255,.55)}
 body.t1{--tapeA:#2c3f8f;--tapeB:rgba(255,215,120,.6)}
 body.t2{--tapeA:#59c4ee;--tapeB:rgba(210,255,150,.6)}
+body.wd{--tapeA:#ffb6a3;--tapeB:rgba(255,255,255,.6)}
+body.wn{--tapeA:#f2c46b;--tapeB:rgba(255,255,255,.55)}
 #wDone{position:absolute;left:0;right:0;bottom:6px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:0 6px;z-index:5;pointer-events:none}
 #wDone .chip{background:linear-gradient(180deg,#fff2c4,#ffd98a);border:1px solid #d9a640;color:#6b3e00;border-radius:8px;font-size:12px;font-weight:800;padding:5px 2px;text-align:center;white-space:nowrap;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.25);animation:pop .4s ease}
 #wDone .chip::before{content:"✓ ";color:#2f9a4a}
@@ -629,5 +631,5 @@ $('wAgainBtn').onclick=()=>{win.classList.remove('on');newGame(G.mode);$('wTime'
 $('wToMenuBtn').onclick=()=>{win.classList.remove('on');show('title')};
 refreshTitle();
 
-window.HCW={layout,refreshTitle,_state:()=>G};
+window.HCW={layout,refreshTitle,_state:()=>G,mode:()=>G?G.mode:wMode};
 })();
