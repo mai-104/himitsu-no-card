@@ -194,6 +194,27 @@ const IMG={
  '十二時の鐘':'kane12',
  '灰':'hai',
 };
+/* 絵のかわりに、色とうすい模様を入れるカード（ロゴは使わず、ただの図形だけ） */
+const PAT={
+ 'ChatGPT':{c1:'#f6f6f3',c2:'#dcdcd6',ink:'#000',shape:'circle'},
+ 'Claude': {c1:'#f3c7ae',c2:'#d9825f',ink:'#5a2410',shape:'square'},
+ 'Gemini': {c1:'#b9c8ff',c2:'#b48cf0',ink:'#2a1a6e',shape:'diamond'},
+ 'Grok':   {c1:'#3a3a3e',c2:'#111114',ink:'#fff',shape:'line'},
+ 'Copilot':{c1:'#9fd3ff',c2:'#ffb3dc',ink:'#1a3a5a',shape:'wave',c3:'#b8f0c8'},
+};
+function patBg(p){
+ const pts=[[8,9,5],[30,6,3.5],[50,14,4.5],[18,30,3],[40,32,5.5],[58,40,3],[10,50,4],[32,54,3.5],[52,58,4.5]];
+ const sh=pts.map(([x,y,r])=>{
+  if(p.shape==='circle')return `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke-width="1.2"/>`;
+  if(p.shape==='square')return `<rect x="${x-r}" y="${y-r}" width="${r*2}" height="${r*2}" rx="${r*.5}" transform="rotate(${x*3} ${x} ${y})"/>`;
+  if(p.shape==='diamond')return `<path d="M${x} ${y-r*1.3}L${x+r*.8} ${y}L${x} ${y+r*1.3}L${x-r*.8} ${y}Z"/>`;
+  if(p.shape==='line')return `<path d="M${x-r} ${y+r}L${x+r} ${y-r}" fill="none" stroke-width="1.2"/>`;
+  return `<path d="M${x-r*1.4} ${y}q${r*.7} ${-r} ${r*1.4} 0t${r*1.4} 0" fill="none" stroke-width="1.2"/>`;
+ }).join('');
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="${p.ink}" stroke="${p.ink}" opacity=".13">${sh}</svg>`;
+ const grad=p.c3?`linear-gradient(120deg,${p.c1},${p.c3},${p.c2})`:`linear-gradient(135deg,${p.c1},${p.c2})`;
+ return `background:url("data:image/svg+xml,${encodeURIComponent(svg)}") 0 0/42% auto repeat,${grad}`;
+}
 const BAND=.25;   // カードの上の名前の帯（カードの高さに対する割合）
 
 /* ---------- 画面（HTML） ---------- */
@@ -317,7 +338,7 @@ function buildEls(){
   const el=document.createElement('div');
   el.className='wcard'+(c.t?' ttl':'');
   const im=c.t?null:(IMG[WORDS[c.g].t+'/'+c.label]||(WORDS.some((x,i)=>i!==c.g&&x.w.includes(c.label))?null:IMG[c.label]));
-  const pic=im?`<div class="pic" style="background-image:url(img/${im}.webp)"></div>`:'';
+  const pic=im?`<div class="pic" style="background-image:url(img/${im}.webp)"></div>`:(!c.t&&PAT[c.label]?`<div class="pic" style='${patBg(PAT[c.label])}'></div>`:'');
   el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc">${pic}<div class="wd">${c.label}</div>${c.t?'<div class="lb">タイトル</div>':''}</div></div>`;
   board.appendChild(el); els[c.id]=el;
  });
