@@ -222,7 +222,7 @@ const css=`
 #wgame .wcard{position:absolute;left:0;top:0;width:var(--ww);height:var(--wh);transition:transform .17s ease;will-change:transform}
 #wgame .wcard.dragging{transition:none}
 #wgame .wcard .in{position:absolute;inset:0}
-#wgame .wcard .bk{position:absolute;inset:0;box-sizing:border-box;border:2px solid #fff;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 3px rgba(0,0,0,.25);background:linear-gradient(90deg,#a8e2cf 50%,transparent 50%) 0 0/calc(var(--ww)*.22) calc(var(--ww)*.22),linear-gradient(#a8e2cf 50%,transparent 50%) 0 0/calc(var(--ww)*.22) calc(var(--ww)*.22),#FCF8EE;background-blend-mode:multiply,multiply,normal}
+#wgame .wcard .bk{position:absolute;inset:0;box-sizing:border-box;border:2px solid #fff;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 3px rgba(0,0,0,.25);background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%3E%3Cg%20fill%3D%22%23ffffff%22%20opacity%3D%22.28%22%3E%3Ccircle%20cx%3D%227%22%20cy%3D%224.6%22%20r%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%229.3%22%20cy%3D%227%22%20r%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229.4%22%20r%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%224.7%22%20cy%3D%227%22%20r%3D%221.6%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%227%22%20cy%3D%227%22%20r%3D%221%22%20fill%3D%22%23fff8dc%22%20opacity%3D%22.5%22%2F%3E%3C%2Fsvg%3E') 0 0/calc(var(--ww)*.19) calc(var(--ww)*.19),#7fd1b8}
 #wgame .wcard .fc{position:absolute;inset:0;display:none;background:#F7EED9;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
 #wgame .wcard.up .fc{display:block}
 #wgame .wcard.up .bk{display:none}
