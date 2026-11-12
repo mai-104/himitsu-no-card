@@ -141,7 +141,11 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
   <h2>グループ分け ソリティア（試作）</h2>
   <div class="seg" id="wModeSeg">
    <button data-m="n">ふつう</button>
-   <button data-m="h">むずかしい</button>
+ <button data-m="h">むずかしい</button>
+  </div>
+  <div class="seg bgmSeg" id="bgmSeg" style="margin-top:8px">
+   <button data-b="1">♪ 音楽あり</button>
+   <button data-b="0">音楽なし</button>
   </div>
   <button class="big" id="wContBtn" style="display:none">続きから</button>
   <button class="big" id="wStartBtn">はじめから</button>
@@ -168,7 +172,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
   </details>
  </div>
 
- <div class="credit">画像：ChatGPTで生成</div>
+ <div class="credit">画像：ChatGPTで生成　BGM：Gemini（Lyria）で生成</div>
 </section>
 
 <!-- ゲーム画面 -->
@@ -202,6 +206,8 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <h3 style="margin-top:12px">ボタン</h3>
  <p>💡 ヒント（3回）　🔀 シャッフル（1回）　↶ ひとつ戻る（3回）<br>使ったボタンは消えます。</p>
  <p>🔀 シャッフルは、場と山の<b>伏せてあるカードだけ</b>を混ぜ直します。表のカードと置き場のカードはそのままです。</p>
+ <div id="bgmBox" style="display:none"><h3 style="margin-top:12px">音楽</h3>
+ <div class="seg bgmSeg" id="bgmSeg2"><button data-b="1">♪ あり</button><button data-b="0">なし</button></div></div>
  <h3 style="margin-top:12px">背景の動き</h3>
  <div class="seg" id="animSeg2"><button data-a="1">動かす</button><button data-a="0">止める</button></div>
  <button class="big" id="sheetClose">ゲームにもどる</button>
@@ -250,7 +256,7 @@ function refreshTitle(){
 }
 refreshTitle();
 
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));if(id==='game'){layout();BG.start()}else if(id==='wgame'){const n=window.HCW&&HCW.mode()==='h';document.body.className=n?'wn':'wd';BG.setOv(n?'night':'day');BG.start();window.HCW&&HCW.layout()}else BG.stop();if(id!=='wgame'){BG.setOv(null);applyBack()}if(id==='title'){refreshTitle();window.HCW&&HCW.refreshTitle()}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));if(id==='game'){layout();BG.start()}else if(id==='wgame'){const n=window.HCW&&HCW.mode()==='h';document.body.className=n?'wn':'wd';BG.setOv(n?'night':'day');BG.start();window.HCW&&HCW.layout()}else BG.stop();if(id!=='wgame'){BG.setOv(null);applyBack();window.HCW&&HCW.stopBgm()}if(id==='title'){refreshTitle();window.HCW&&HCW.refreshTitle()}}
 
 
 /* ---------- 動く背景 ---------- */
@@ -714,7 +720,7 @@ $('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();ret
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
 $('newBtn').onclick=()=>{setPause(false);if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
 $('pauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
-function openSheet(w){$('sheetHow').innerHTML=document.querySelector(w?'#wHow':'.howto details').innerHTML.replace(/<summary>.*?<\/summary>/,'');syncAnim2();$('sheet').classList.add('on')}
+function openSheet(w){$('bgmBox').style.display=w?'block':'none';window.HCW&&HCW.syncBgm();$('sheetHow').innerHTML=document.querySelector(w?'#wHow':'.howto details').innerHTML.replace(/<summary>.*?<\/summary>/,'');syncAnim2();$('sheet').classList.add('on')}
 $('sheetBtn').onclick=()=>openSheet(false);
 $('sheetClose').onclick=()=>$('sheet').classList.remove('on');
 function syncAnim2(){[...$('animSeg2').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}

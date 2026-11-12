@@ -613,6 +613,38 @@ function winGame(){
  for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';s.textContent=p;s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
 }
 
+/* ---------- BGM（昼＝ふつう、夜＝むずかしい。終わりと始まりを重ねてくり返す） ---------- */
+const BGM=(()=>{
+ const VOL=.45, FADE=3;
+ let on=load('hc_bgm',1), cur=null, pair=[], tm=0, want=null;
+ const mk=src=>{const a=new Audio(src);a.preload='auto';a.volume=0;return a};
+ function fadeTo(a,v,ms){const s=a.volume,t0=performance.now();const st=()=>{const k=Math.min(1,(performance.now()-t0)/ms);a.volume=Math.max(0,Math.min(1,s+(v-s)*k));if(k<1)a._f=requestAnimationFrame(st)};cancelAnimationFrame(a._f);st()}
+ function tick(){
+  const a=pair[cur]; if(!a||a.paused||!a.duration)return;
+  if(a.currentTime>a.duration-FADE&&!a._x){a._x=1;const b=pair[1-cur];b._x=0;b.currentTime=0;b.volume=0;b.play().catch(()=>{});fadeTo(b,VOL,FADE*1000);fadeTo(a,0,FADE*1000);setTimeout(()=>{a.pause();a._x=0},FADE*1000+100);cur=1-cur}
+ }
+ function stopAll(){pair.forEach(a=>{fadeTo(a,0,600);setTimeout(()=>a.pause(),650)});clearInterval(tm);tm=0}
+ return{
+  play(name){want=name;if(!on)return;
+   const src='bgm/'+name+'.mp3';
+   if(!pair.length||pair[0]._src!==src){pair.forEach(a=>a.pause());pair=[mk(src),mk(src)];pair.forEach(a=>a._src=src);cur=0}
+   const a=pair[cur];if(!a.paused)return;
+   a.play().then(()=>fadeTo(a,VOL,1200)).catch(()=>{});
+   if(!tm)tm=setInterval(tick,200);
+  },
+  stop(){want=null;stopAll()},
+  pause(){pair.forEach(a=>a.pause())},
+  resume(){if(want&&on)this.play(want)},
+  set(v){on=v;save('hc_bgm',v);if(v){if(want)this.play(want)}else stopAll()},
+  get on(){return on}
+ };
+})();
+const bgmName=()=>(G?G.mode:wMode)==='h'?'night':'day';
+function syncBgm(){document.querySelectorAll('.bgmSeg').forEach(sg=>[...sg.children].forEach(b=>b.classList.toggle('sel',+b.dataset.b===(BGM.on?1:0))))}
+document.querySelectorAll('.bgmSeg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;BGM.set(+b.dataset.b);if(+b.dataset.b&&sec.classList.contains('on'))BGM.play(bgmName());syncBgm()}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)BGM.pause();else if(sec.classList.contains('on'))BGM.resume()});
+syncBgm();
+
 /* ---------- タイトル画面とボタン ---------- */
 let wMode=load('hc_wmode','n');
 function refreshTitle(){
@@ -620,16 +652,16 @@ function refreshTitle(){
  const s=load(key(wMode),null);$('wContBtn').style.display=(s&&!s.won)?'block':'none';
 }
 $('wModeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;wMode=b.dataset.m;save('hc_wmode',wMode);refreshTitle()};
-function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';show('wgame')}
+function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';show('wgame');BGM.play(bgmName())}
 $('wStartBtn').onclick=start;
-$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame')};
-$('wMenuBtn').onclick=()=>{persist();show('title')};
+$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame');BGM.play(bgmName())};
+$('wMenuBtn').onclick=()=>{persist();BGM.stop();show('title')};
 $('wPauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
 $('wNewBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;setPause(false);newGame(G?G.mode:wMode);$('wTime').textContent='0:00';layout()};
 $('wSheetBtn').onclick=()=>openSheet(true);
 $('wAgainBtn').onclick=()=>{win.classList.remove('on');newGame(G.mode);$('wTime').textContent='0:00';layout()};
-$('wToMenuBtn').onclick=()=>{win.classList.remove('on');show('title')};
+$('wToMenuBtn').onclick=()=>{win.classList.remove('on');BGM.stop();show('title')};
 refreshTitle();
 
-window.HCW={layout,refreshTitle,_state:()=>G,mode:()=>G?G.mode:wMode};
+window.HCW={layout,refreshTitle,_state:()=>G,mode:()=>G?G.mode:wMode,syncBgm,stopBgm:()=>BGM.stop(),_bgm:BGM};
 })();
