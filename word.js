@@ -143,7 +143,7 @@ const css=`
 #wgame .wslot{position:absolute;left:0;top:0;width:var(--ww);height:var(--wh);border:2px dashed var(--slot);border-radius:calc(var(--wh)*.14);display:flex;align-items:center;justify-content:center;color:var(--slot);font-size:calc(var(--wh)*.24);font-weight:700;text-align:center;line-height:1.2}
 /* マスキングテープ（同じグループがつながったとき） */
 #wgame .wcard.tape::before,#wgame .wcard.tape::after{content:"";position:absolute;top:calc(var(--wh)*-.13);width:calc(var(--ww)*.13);height:calc(var(--wh)*.36);z-index:2;
- background-color:var(--tapeA);background-image:linear-gradient(90deg,var(--tapeB) 50%,transparent 50%),linear-gradient(var(--tapeB) 50%,transparent 50%);background-size:6px 6px;opacity:.88;
+ background-color:var(--tapeA);background-image:linear-gradient(90deg,var(--tapeB) 50%,transparent 50%),linear-gradient(var(--tapeB) 50%,transparent 50%);background-size:6px 6px;opacity:.5;
  clip-path:polygon(0 8%,20% 0,40% 8%,60% 0,80% 8%,100% 0,100% 92%,80% 100%,60% 92%,40% 100%,20% 92%,0 100%)}
 #wgame .wcard.tape::before{left:6%;transform:rotate(-6deg)}
 #wgame .wcard.tape::after{right:6%;transform:rotate(5deg)}
@@ -259,7 +259,7 @@ function layout(){
  gap=Math.max(4,Math.round(bw*.014));
  cw=Math.floor((bw-gap*(NCOL+1))/NCOL); ch=Math.round(cw*.7);
  offX=Math.round((W-(cw*NCOL+gap*(NCOL+1)))/2);
- y0=gap; yW=y0+ch+gap; os=0; tabTop=yW+ch+gap*2;
+ y0=gap; yW=y0+ch+gap; os=Math.round(ch*.45); tabTop=yW+(NEED-2)*os+ch+gap*2; // 置き場は4枚まで下に並ぶ
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
@@ -291,7 +291,7 @@ function render(){
   slotEls[si].style.visibility=s?'hidden':'visible';
   if(!s)return;
   place({id:s.title,up:true},colX(si),y0,10,'slot',si,0);vis.add(s.title);
-  s.names.forEach((id,i)=>{place({id,up:true},colX(si),yW,11+i,'slotn',si,i);vis.add(id)});
+  s.names.forEach((id,i)=>{place({id,up:true},colX(si),yW+i*os,11+i,'slotn',si,i);vis.add(id)});
   els[s.title].querySelector('.lb').textContent=`${s.names.length} / ${NEED}`;
  });
  renderDone();
