@@ -505,7 +505,7 @@ function layout(){
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
- G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].length;wd.style.fontSize=Math.min(ch*BAND*.82,(cw*.92)/Math.max(len,2.2))+'px'});
+ G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].reduce((a,ch)=>a+(/[\x20-\x7e]/.test(ch)?(/[A-Z]/.test(ch)?.68:.56):1),0);wd.style.fontSize=Math.min(ch*BAND*.82,(cw*.92)/Math.max(len,2.2))+'px'});
  render();
 }
 function renderDone(){
