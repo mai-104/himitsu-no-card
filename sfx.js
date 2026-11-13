@@ -24,7 +24,6 @@ function hiss(t,dur,{vol=.25,f=2500,f2=null,q=1.2,type='bandpass',a=.004}={}){
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
  s.connect(bp);bp.connect(g);g.connect(master);s.start(t,Math.random()*.5);s.stop(t+dur+.05);
 }
-function bell(f,t,vol=.18,dur=1.2){[1,2.01,2.76,5.4].forEach((m,i)=>tone(f*m,t,dur/(1+i*.6),{vol:vol/(1+i*1.4),a:.002}))}
 
 /* 効果音 */
 const S={
@@ -41,10 +40,10 @@ const S={
  stuck(t){[784,659,523].forEach((f,i)=>tone(f,t+i*.14,.5,{type:'triangle',vol:.12}))},                    // 進めないお知らせ
  nudge(t){tone(784,t,.12,{vol:.13});tone(1175,t+.1,.22,{vol:.13})},                                        // ヒントも使えるよ
  title(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
-  st(1976,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く（ち→りん、やわらかく上がって響く）
- group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.16,a:.003});tone(f/2,tt,d*.5,{vol:.05,a:.003});tone(f*2,tt,d*.3,{vol:.03,a:.002})})}, // グループ・マークがそろう（きらきら）
+  st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く（ち→りん、やわらかく上がって響く）
+ group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
  clear(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
-  [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});bell(2093,t+.6,.08,1.4)}, // クリア
+  [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア
 };
 window.SFX={
  play(name){if(!on)return;const c=ac();if(!c||!S[name])return;S[name](c.currentTime+.01)},
