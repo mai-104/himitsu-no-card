@@ -403,6 +403,10 @@ body.wn{--tapeA:#f2c46b;--tapeB:rgba(255,255,255,.55)}
 #wwin .big.sub2{background:rgba(0,0,0,.08);color:var(--btnInk)}
 #wPauseLbl{position:absolute;left:50%;top:78%;white-space:nowrap;transform:translate(-50%,-50%);z-index:1500;background:var(--bar);color:var(--ink);padding:14px 22px;border-radius:16px;font-size:16px;font-weight:700;text-align:center;display:none;pointer-events:none;backdrop-filter:blur(4px)}
 #wPauseLbl small{display:block;font-size:12px;font-weight:400;margin-top:4px}
+#wgame{-webkit-touch-callout:none}
+#wZoom{position:absolute;inset:0;z-index:3000;background:rgba(30,20,50,.45);display:none;pointer-events:none}
+#wZoom.on{display:block}
+#wZoom .wcard{transition:none;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 const sec=document.createElement('section');
@@ -716,14 +720,36 @@ board.addEventListener('pointerdown',e=>{
  const p=t.dataset.pile;
  if(p==='stock'){tapStock();return}
  if(!t.classList.contains('wcard'))return;
+ if(t.classList.contains('up')){startLP(t,e);e.preventDefault()}
  if(p!=='tab'&&p!=='waste')return;
  const pi=+t.dataset.pi,idx=+t.dataset.idx,list=pileOf(p,pi);
  if(p==='waste'&&idx!==list.length-1)return;
  const run=p==='tab'?runAt(list,idx):[list[idx]];
- if(!run){shake([list[idx]]);return}
+ if(!run){if(lp)lp.onTap=()=>shake([list[idx]]);else shake([list[idx]]);return}
  drag={src:{pile:p,pi,idx},run,sx:e.clientX,sy:e.clientY,moved:false};e.preventDefault();
 });
+/* 長押しで、表になっているカードを大きく見る（重なったカードも見える） */
+let lp=null;const zoom=document.createElement('div');zoom.id='wZoom';sec.appendChild(zoom);
+function startLP(el,e){
+ if(lp)clearTimeout(lp.tm);
+ lp={el,sx:e.clientX,sy:e.clientY,shown:false,onTap:null};
+ lp.tm=setTimeout(()=>{if(!lp)return;lp.shown=true;showZoom(lp.el);
+  if(drag){drag.run.forEach(p=>els[p.id].classList.remove('dragging'));drag=null;render()}},450);
+}
+function showZoom(el){
+ const W=sec.clientWidth,H=sec.clientHeight,zw=Math.min(W*.86,440),k=zw/cw,zh=ch*k;
+ const c=el.cloneNode(true);c.classList.remove('hint','dragging','shake','tape','gone');
+ c.style.cssText=`--ww:${zw}px;--wh:${zh}px;width:${zw}px;height:${zh}px;transform:translate(${(W-zw)/2}px,${(H-zh)/2}px);z-index:1`;
+ const wd=c.querySelector('.wd'),fs=parseFloat(el.querySelector('.wd').style.fontSize)||14;wd.style.fontSize=fs*k+'px';
+ zoom.innerHTML='';zoom.appendChild(c);zoom.classList.add('on');
+}
+function endLP(){
+ if(!lp)return false;clearTimeout(lp.tm);const L=lp;lp=null;
+ if(L.shown){zoom.classList.remove('on');zoom.innerHTML='';return true}
+ if(L.onTap)L.onTap();return false;
+}
 addEventListener('pointermove',e=>{
+ if(lp&&!lp.shown&&Math.hypot(e.clientX-lp.sx,e.clientY-lp.sy)>=8){clearTimeout(lp.tm);lp=null}
  if(!drag)return;
  const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
  if(!drag.moved&&Math.hypot(dx,dy)<8)return;
@@ -742,7 +768,8 @@ function endDrag(){
  else if(!(d.src.pile==='tab'&&d.src.pi===col)&&canTab(d.run,col)){doMove(d.src,d.run,'tab',col);ok=true}
  if(!ok){render();if(!(d.src.pile==='tab'&&d.src.pi===col&&cy>=tabTop-ch*.2))sfx('ng')}
 }
-addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
+addEventListener('pointerup',()=>{if(endLP())return;endDrag()});addEventListener('pointercancel',()=>{endLP();endDrag()});
+board.addEventListener('contextmenu',e=>e.preventDefault());
 
 /* ---------- 時間・一時停止 ---------- */
 function setPause(v){paused=v;$('wPauseLbl').style.display=v?'block':'none';$('wPauseBtn').innerHTML=v?'<small>▶</small>再開':'<small>⏸</small>一時停止'}
