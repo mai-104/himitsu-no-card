@@ -25,7 +25,7 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("placeOld")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("reveal2")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
@@ -36,7 +36,9 @@ const L=[
   ['placeOld','カードを下の列に置く（保存版）','ことっ','both'],
   ['found','カードを上の置き場に置く','ぽん（少し明るい音）','both'],
   ['ng','置けない場所に動かした','こつこつ（小さく低い音）','both'],
-  ['reveal','伏せたカードが表になる','ふわっ（小さな音）','both'],
+  ['reveal','伏せたカードが表になる（新・ぽわっ）','下から上へふくらむ音','both'],
+  ['reveal2','伏せたカードが表になる（新・ふわっ）','空気がふくらんで、やわらかい2音','both'],
+  ['revealOld','伏せたカードが表になる（保存版）','前の音','both'],
  ]],
  ['うれしい場面',[
   ['title','タイトルを置き場に置く（新）','ぽ・ぽーん（置き場の音と同じ種類）','word'],

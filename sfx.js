@@ -33,7 +33,10 @@ const S={
  placeOld(t){tone(196,t,.12,{type:'triangle',vol:.22,f2:150});hiss(t,.03,{vol:.12,f:1800,q:.8})},       // 列に置く・保存版（ことっ）
  found(t){tone(784,t,.22,{type:'triangle',vol:.2});tone(1175,t+.03,.25,{vol:.08})},                        // 置き場に置く
  ng(t){tone(165,t,.08,{type:'triangle',vol:.2,f2:140});tone(150,t+.09,.1,{type:'triangle',vol:.16,f2:120})},// 置けない
- reveal(t){hiss(t,.18,{vol:.1,f:2200,f2:4200,q:1,a:.06});tone(1047,t+.04,.25,{vol:.06})},              // 表になる
+ reveal(t){tone(392,t,.28,{type:'triangle',vol:.16,a:.012,f2:784});tone(784,t+.03,.25,{vol:.05,a:.02});
+  tone(523,t+.15,.2,{type:'triangle',vol:.06,a:.015,f2:880});hiss(t,.18,{vol:.04,f:1800,f2:3000,q:.6,a:.05})}, // 表になる（ぽわっ：下から上へふくらむ音）
+ reveal2(t){hiss(t,.35,{vol:.06,f:1200,f2:3600,q:.5,a:.12});tone(1568,t+.05,.6,{vol:.06,a:.06});tone(1319,t+.18,.7,{vol:.05,a:.06})}, // 表になる・案2（ふわっ：空気がふくらんで、やわらかい2音）
+ revealOld(t){hiss(t,.18,{vol:.1,f:2200,f2:4200,q:1,a:.06});tone(1047,t+.04,.25,{vol:.06})},              // 表になる・保存版
  shuffle(t){for(let i=0;i<9;i++)hiss(t+i*.045,.05,{vol:.22,f:2600+Math.random()*1200,q:1.4});hiss(t+.42,.15,{vol:.15,f:1500,q:.8})}, // シャッフル
  hint(t){tone(988,t,.12,{vol:.16});tone(1319,t+.09,.2,{vol:.16})},                                         // ヒント
  undo(t){tone(660,t,.22,{type:'triangle',vol:.14,f2:330});hiss(t,.2,{vol:.07,f:3000,f2:1200})},           // ひとつ戻る
