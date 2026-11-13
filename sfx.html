@@ -25,14 +25,16 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearOld")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearF")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
  ['考え中：クリアのファンファーレ',[
-  ['clear','新しい案','グループがそろう音と同じ種類（上がっていって、和音で響く）','both'],
+  ['clearD','案D','ぱんぱかぱーん（短・短・短・長）＋きらきら','both'],
+  ['clearE','案E','ソ・ラ・シ・レー・シ・レーー（歌うようなメロディ）','both'],
+  ['clearF','案F','3回、だんだん高く上がる','both'],
+  ['clear','今の案','上がっていって、きらきらが響く','both'],
   ['group','くらべる用：グループがそろう','きらきら','both'],
-  ['clearOld','前の案A','上がる4音のあとに和音','both'],
  ]],
  ['確定した音',[
   ['flip','山からカードをめくる','ぺらっ','both'],
