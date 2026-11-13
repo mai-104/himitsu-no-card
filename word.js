@@ -221,6 +221,8 @@ const IMG={
  'トランペット':'trumpet',
  'タンバリン':'tambourine',
  'カスタネット':'castanet',
+ 'つみき':'tsumiki',
+ 'ブロック':'block',
  'フライパン':'furaipan',
  'ボウル':'bowl',
  'おたま':'otama',
