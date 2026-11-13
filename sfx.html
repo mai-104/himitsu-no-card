@@ -25,11 +25,12 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearJ")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearK")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
  ['考え中：クリアのファンファーレ',[
+  ['clearK','案K（J＋ぱんぱかぱーん）','上がる → 上がる → ぱんぱかぱーん → きらきら','both'],
   ['clearI','案I（Fの3回目を今の案に）','上がる → 上がる → 今の案（上がってきらきら）','both'],
   ['clearJ','案J（Iの3回目を高く始める）','上がる → 上がる → 高いところから上がってきらきら','both'],
   ['clearG','案G（今の案＋D）','上がる → ぱんぱかぱーん → きらきら','both'],
