@@ -1,5 +1,5 @@
 """ルナの絵（5:4・上が空白）からカード用の絵を作る。
-使い方: python3 tools/make_card_img.py 元画像 出力名(英数字)
+使い方: python3 tools/make_card_img.py 元画像 出力名(英数字) [空白の割合]
 上の空白を自動で見つけて切り取り、横5:縦2.8（カードの下7割）にぴったり合わせて img/出力名.webp に保存する。"""
 import sys, statistics
 from PIL import Image
@@ -13,6 +13,8 @@ for y in range(int(H * .1), int(H * .6)):
     d = statistics.mean(sum(abs(a - b) for a, b in zip(c, top)) for c in row)
     sd = statistics.pstdev([sum(c) for c in row])
     if d > 60 or sd > 18: start = y; break
+# 絵の一部（槍など）が空白にはみ出して早く止まったときは、3つ目に割合を指定する（例: 0.315）
+if len(sys.argv) > 3: start = int(H * float(sys.argv[3]))
 art = im.crop((0, start, W, H)); aw, ah = art.size
 TW, TH = 500, 280                      # 5 : 2.8（上の帯の大きさに合わせてゲーム側で少し切る）
 r = max(TW / aw, TH / ah)
