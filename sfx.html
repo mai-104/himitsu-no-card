@@ -22,7 +22,11 @@ h2{font-size:15px;margin:18px 0 8px}
 <h1>効果音の試聴（マリン作）</h1>
 <p class="note">ボタンを押すと音が鳴ります。音が出ないときは、スマホのマナーモードと音量を確かめてください。</p>
 <div id="list"></div>
-<script src="sfx.js"></script>
+<p class="note" id="ver"></p>
+<script>
+/* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（タイトルの音："+(SFX.list.includes("titleChirin")?"新しい版":"古い版")+"）"};document.head.appendChild(sc);
+</script>
 <script>
 const L=[
  ['いつも鳴る音',[
@@ -56,7 +60,7 @@ L.forEach(([h,items])=>{
   box.insertAdjacentHTML('beforeend',`<div class="item"><button data-k="${k}">▶</button><div><div class="t">${t}<span class="tag ${TAG[g][1]}">${TAG[g][0]}</span></div><div class="d">${d}</div></div></div>`);
  });
 });
-box.addEventListener('click',e=>{const b=e.target.closest('button');if(b)SFX.play(b.dataset.k)});
+box.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&window.SFX)SFX.play(b.dataset.k)});
 </script>
 </body>
 </html>
