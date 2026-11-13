@@ -49,8 +49,9 @@ const S={
   st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く・保存版（ちりん）
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
  clear(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
-  [784,988,1175,1568,1976,2349,3136].forEach((f,i)=>k(f,t+i*.09,1,.12));
-  [1568,1976,2349,3136].forEach(f=>k(f,t+.75,3,.07))}, // クリア（グループがそろう音と同じ種類：上がっていって、和音で響く）
+  [1568,1976,2349,3136,3951,4699].forEach((f,i)=>k(f,t+i*.08,1,.12));
+  [1568,2349,3136,3951,4699].forEach(f=>k(f,t+.58,3,.065));
+  [3136,3951,4699].forEach((f,i)=>k(f,t+1.05+i*.07,1.4,.06))}, // クリア（グループがそろう音と同じ種類：上がっていって、和音で響く）
  clearOld(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
   [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア・保存版
  ngB(t){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(330,t);o.frequency.exponentialRampToValueAtTime(196,t+.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g);g.connect(master);o.start(t);o.stop(t+.25)}, // 置けない・案B（ぽこっ：下がる音1つ）
