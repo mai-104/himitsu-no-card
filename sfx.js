@@ -49,6 +49,12 @@ const S={
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
  clear(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
   [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア
+ ngB(t){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(330,t);o.frequency.exponentialRampToValueAtTime(196,t+.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g);g.connect(master);o.start(t);o.stop(t+.25)}, // 置けない・案B（ぽこっ：下がる音1つ）
+ ngC(t){tone(330,t,.12,{type:'triangle',vol:.13,a:.008});tone(262,t+.13,.18,{type:'triangle',vol:.13,a:.008})}, // 置けない・案C（ぽ・ぽ：やさしく下がる2音）
+ clearB(t){const n=[[392,0,.12],[392,.14,.12],[523,.28,.5]];n.forEach(([f,d,l])=>{tone(f,t+d,l,{type:'triangle',vol:.16,a:.01});tone(f*2,t+d,l*.6,{vol:.04,a:.01})});
+  [523,659,784].forEach(f=>tone(f,t+.8,1.6,{type:'triangle',vol:.1,a:.04}));tone(1047,t+.8,1.6,{vol:.06,a:.04})}, // クリア・案B（ぱっぱらー）
+ clearC(t){[659,784,1047,1175,1319].forEach((f,i)=>tone(f,t+i*.16,.6,{vol:.12,a:.02}));
+  [523,659,784,1047].forEach(f=>tone(f,t+.85,1.8,{vol:.07,a:.08}))}, // クリア・案C（やさしいメロディ）
 };
 window.SFX={
  play(name){if(!on)return;const c=ac();if(!c||!S[name])return;S[name](c.currentTime+.01)},

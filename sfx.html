@@ -25,34 +25,34 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("reveal2")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearC")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
- ['いつも鳴る音',[
-  ['flip','山からカードをめくる','ぺらっ（紙をめくる音）','both'],
-  ['recycle','めくったカードを山に戻す','しゅっ（まとめる音）','both'],
-  ['place','カードを下の列に置く（新）','ぽん（置き場の音より低くやさしく）','both'],
-  ['placeOld','カードを下の列に置く（保存版）','ことっ','both'],
-  ['found','カードを上の置き場に置く','ぽん（少し明るい音）','both'],
-  ['ng','置けない場所に動かした','こつこつ（小さく低い音）','both'],
-  ['reveal','伏せたカードが表になる（新・ぽわっ）','下から上へふくらむ音','both'],
-  ['reveal2','伏せたカードが表になる（新・ふわっ）','空気がふくらんで、やわらかい2音','both'],
-  ['revealOld','伏せたカードが表になる（保存版）','前の音','both'],
+ ['考え中：置けない場所に動かした',[
+  ['ng','案A（今の音）','こつこつ（低い2音）','both'],
+  ['ngB','案B','ぽこっ（下がる音1つ）','both'],
+  ['ngC','案C','ぽ・ぽ（やさしく下がる2音）','both'],
  ]],
- ['うれしい場面',[
-  ['title','タイトルを置き場に置く（新）','ぽ・ぽーん（置き場の音と同じ種類）','word'],
-  ['titleChirin','タイトルを置き場に置く（保存版）','ちりん','word'],
-  ['group','グループがそろう／マークが K までそろう','きらきら（短い和音）','both'],
-  ['clear','クリア','短いファンファーレ','both'],
+ ['考え中：クリアのファンファーレ',[
+  ['clear','案A（今の音）','上がる4音のあとに和音','both'],
+  ['clearB','案B','ぱっぱらー（明るいファンファーレ）','both'],
+  ['clearC','案C','やさしいメロディのあとに和音','both'],
  ]],
- ['ボタン・お知らせ',[
-  ['shuffle','シャッフル','しゃらしゃら（混ぜる音）','both'],
+ ['確定した音',[
+  ['flip','山からカードをめくる','ぺらっ','both'],
+  ['recycle','めくったカードを山に戻す','しゅっ','both'],
+  ['place','カードを下の列に置く','ぽん（低め）','both'],
+  ['found','カードを上の置き場に置く','ぽん（明るめ）','both'],
+  ['reveal','伏せたカードが表になる','ぽわっ','both'],
+  ['title','タイトルを置き場に置く','ぽ・ぽーん','word'],
+  ['group','グループがそろう／マークが K までそろう','きらきら','both'],
+  ['shuffle','シャッフル','しゃらしゃら','both'],
   ['hint','ヒント','ぴこっ','both'],
-  ['undo','ひとつ戻る','しゅるっ（巻き戻す音）','both'],
-  ['pause','一時停止・再開','かちっ（小さなクリック）','both'],
-  ['stuck','進めないお知らせ','ぽろん（やさしい下がる音）','both'],
-  ['nudge','「ヒントも使えるよ!!」','ぴろん（軽い上がる音）','both'],
+  ['undo','ひとつ戻る','しゅるっ','both'],
+  ['pause','一時停止・再開','かちっ','both'],
+  ['stuck','進めないお知らせ','ぽろん','both'],
+  ['nudge','「ヒントも使えるよ!!」','ぴろん','both'],
  ]],
 ];
 const TAG={both:['両方','both'],word:['グループ分けだけ','word'],classic:['クラシックだけ','classic']};
