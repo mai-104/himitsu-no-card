@@ -39,8 +39,10 @@ const S={
  pause(t){tone(880,t,.05,{vol:.1});tone(660,t+.05,.06,{vol:.08})},                                         // 一時停止・再開
  stuck(t){[784,659,523].forEach((f,i)=>tone(f,t+i*.14,.5,{type:'triangle',vol:.12}))},                    // 進めないお知らせ
  nudge(t){tone(784,t,.12,{vol:.13});tone(1175,t+.1,.22,{vol:.13})},                                        // ヒントも使えるよ
- title(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
-  st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く（ち→りん、やわらかく上がって響く）
+ title(t){tone(784,t,.22,{type:'triangle',vol:.17});tone(1175,t+.03,.25,{vol:.07});
+  tone(1047,t+.1,.5,{type:'triangle',vol:.19});tone(1568,t+.13,.55,{vol:.07})}, // タイトルを置く（置き場と同じ「ぽん」の音で、ぽ・ぽーん）
+ titleChirin(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
+  st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く・保存版（ちりん）
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
  clear(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
   [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア
