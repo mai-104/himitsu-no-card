@@ -25,11 +25,14 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearL")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearO")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
  ['考え中：クリアのファンファーレ',[
+  ['clearM','案M（今の案を豪華に）','ゆったり上がって、和音でジャーン → きらきら','both'],
+  ['clearN','案N（和音で上がる）','ジャン・ジャン・ジャン・ジャーン（和音が4段で上がる）→ きらきら','both'],
+  ['clearO','案O（ためてジャーン）','だんだん大きく上がって、少しためてからジャーン → きらきら','both'],
   ['clearL','案L','たたたらったら〜んっ ＋ きらきら','both'],
   ['clearK','案K（J＋ぱんぱかぱーん）','上がる → 上がる → ぱんぱかぱーん → きらきら','both'],
   ['clearI','案I（Fの3回目を今の案に）','上がる → 上がる → 今の案（上がってきらきら）','both'],
