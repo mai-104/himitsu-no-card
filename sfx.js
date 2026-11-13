@@ -63,6 +63,14 @@ const S={
   [1568,1976,2349].forEach((f,i)=>k(f,t+i*.08,.8,.1));
   [2093,2637,3136].forEach((f,i)=>k(f,t+.36+i*.08,.8,.11));
   [2349,2960,3520,4699].forEach((f,i)=>k(f,t+.72+i*.08,i<3?1.2:2.8,.12))}, // クリア・案F（3回、だんだん高く上がる）
+ clearG(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
+  [1568,1976,2349,3136].forEach((f,i)=>k(f,t+i*.07,.9,.1));
+  [[2349,.36,.25],[2349,.49,.25],[2349,.62,.25],[3136,.76,2.6]].forEach(([f,d,l])=>{k(f,t+d,l,.13);k(f*.8,t+d,l*.8,.05)});
+  const sp=[3951,4699,3951,4699,3951,4699];sp.forEach((f,i)=>k(f,t+.9+i*.1,i<sp.length-1?1.6:3.4,.06))}, // クリア・案G（上がる→ぱんぱかぱーん→きらきらが重なって響く）
+ clearH(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
+  [[2349,0,.25],[2349,.13,.25],[2349,.26,.25],[3136,.4,1.6]].forEach(([f,d,l])=>{k(f,t+d,l,.13);k(f*.8,t+d,l*.8,.05)});
+  [1568,1976,2349,3136,3951,4699].forEach((f,i)=>k(f,t+.62+i*.07,1.2,.1));
+  const sp=[3951,4699,3951,4699,3951,4699];sp.forEach((f,i)=>k(f,t+.95+i*.1,i<sp.length-1?1.6:3.4,.06))}, // クリア・案H（ぱんぱかぱーん→上がる→きらきらが重なって響く）
  ngB(t){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(330,t);o.frequency.exponentialRampToValueAtTime(196,t+.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g);g.connect(master);o.start(t);o.stop(t+.25)}, // 置けない・案B（ぽこっ：下がる音1つ）
  ngC(t){tone(330,t,.12,{type:'triangle',vol:.13,a:.008});tone(262,t+.13,.18,{type:'triangle',vol:.13,a:.008})}, // 置けない・案C（ぽ・ぽ：やさしく下がる2音）
  clearB(t){const n=[[392,0,.12],[392,.14,.12],[523,.28,.5]];n.forEach(([f,d,l])=>{tone(f,t+d,l,{type:'triangle',vol:.16,a:.01});tone(f*2,t+d,l*.6,{vol:.04,a:.01})});
