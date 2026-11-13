@@ -48,7 +48,7 @@ const S={
  titleChirin(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
   st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く・保存版（ちりん）
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
- clear(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
+ clearPrev(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
   [1568,1976,2349,3136,3951,4699].forEach((f,i)=>k(f,t+i*.08,1.2,.12));
   const sp=[3136,3951,4699,3951,4699,3951,4699];sp.forEach((f,i)=>k(f,t+.32+i*.1,i<sp.length-1?1.8:3.6,.07))}, // クリア（グループがそろう音と同じ種類：上がっていって、高い音のきらきらが重なって響き続ける）
  clearOld(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
@@ -95,10 +95,10 @@ const S={
   const n=[1568,1976,2349,3136,3951];n.forEach((f,i)=>{k(f,t+i*.16,1.2,.1);k(f*.75,t+i*.16,1,.045)});
   const T=t+.8;[3136,3951,4699].forEach((f,i)=>k(f,T,3.2,i==2?.11:.06));k(1568,T,2.5,.05);
   const sp=[4699,5274,4699,5274,6272,5274];sp.forEach((f,i)=>k(f,T+.2+i*.14,i<sp.length-1?1.6:3.4,.045))}, // クリア・案Mを少し高く（+2）
- clearM3(t){const r=1.2599,k=(f,tt,d,v)=>{f*=r;tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
+ clear(t){const r=1.2599,k=(f,tt,d,v)=>{f*=r;tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
   const n=[1568,1976,2349,3136,3951];n.forEach((f,i)=>{k(f,t+i*.16,1.2,.1);k(f*.75,t+i*.16,1,.045)});
   const T=t+.8;[3136,3951,4699].forEach((f,i)=>k(f,T,3.2,i==2?.11:.06));k(1568,T,2.5,.05);
-  const sp=[4699,5274,4699,5274,6272,5274];sp.forEach((f,i)=>k(f,T+.2+i*.14,i<sp.length-1?1.6:3.4,.045))}, // クリア・案Mをもう少し高く（+4）
+  const sp=[4699,5274,4699,5274,6272,5274];sp.forEach((f,i)=>k(f,T+.2+i*.14,i<sp.length-1?1.6:3.4,.045))}, // クリア（確定：案Mをもう少し高く。ゆったり上がって和音でジャーン＋きらきら）
  clearN(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
   // 和音が4段で上がる（ジャン・ジャン・ジャン・ジャーン）
   [[[1568,1976,2349],0,.5],[[2093,2637,3136],.26,.5],[[2349,2960,3520],.52,.5],[[3136,3951,4699],.84,3.2]]
@@ -123,7 +123,7 @@ const S={
   [523,659,784,1047].forEach(f=>tone(f,t+.85,1.8,{vol:.07,a:.08}))}, // クリア・案C（やさしいメロディ）
 };
 window.SFX={
- play(name){if(!on)return;const c=ac();if(!c||!S[name])return;S[name](c.currentTime+.01)},
+ play(name,delay=0){if(!on)return;const c=ac();if(!c||!S[name])return;S[name](c.currentTime+.01+delay)},
  set(v){on=v?1:0;try{localStorage.setItem('hc_sfx',on)}catch(e){}},
  get on(){return on},
  list:Object.keys(S),

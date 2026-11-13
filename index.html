@@ -129,6 +129,11 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
    <button data-a="1">動かす</button>
    <button data-a="0">止める</button>
   </div>
+  <h2 style="margin-top:14px">効果音</h2>
+  <div class="seg sfxSeg">
+   <button data-s="1">♪ あり</button>
+   <button data-s="0">なし</button>
+  </div>
  </div>
 
  <div class="panel">
@@ -208,6 +213,8 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <p>🔀 シャッフルは、場と山の<b>伏せてあるカードだけ</b>を混ぜ直します。表のカードと置き場のカードはそのままです。</p>
  <div id="bgmBox" style="display:none"><h3 style="margin-top:12px">音楽</h3>
  <div class="seg bgmSeg" id="bgmSeg2"><button data-b="1">♪ あり</button><button data-b="0">なし</button></div></div>
+ <h3 style="margin-top:12px">効果音</h3>
+ <div class="seg sfxSeg"><button data-s="1">♪ あり</button><button data-s="0">なし</button></div>
  <h3 style="margin-top:12px">背景の動き</h3>
  <div class="seg" id="animSeg2"><button data-a="1">動かす</button><button data-a="0">止める</button></div>
  <button class="big" id="sheetClose">ゲームにもどる</button>
@@ -219,6 +226,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <button class="big sub2" id="toMenuBtn">メニューへ</button>
 </div></div>
 
+<script src="sfx.js"></script>
 <script>
 (()=>{
 const BACKS=[{f:'back1.webp',n:'桜',p:'🌸'},{f:'back2.webp',n:'星と月',p:'⭐'},{f:'back3.webp',n:'金魚',p:'🫧'}];
@@ -250,6 +258,11 @@ function applyAnim(){[...$('animSeg').children].forEach(b=>b.classList.toggle('s
 $('animSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.anim=+b.dataset.a;save('hc_pref',pref);applyAnim()};
 applyBack();applyAnim();
 
+/* 効果音（両方のゲームで共通） */
+function sfx(n,d){if(window.SFX)SFX.play(n,d)}
+function syncSfx(){const v=window.SFX&&SFX.on?1:0;document.querySelectorAll('.sfxSeg').forEach(sg=>[...sg.children].forEach(b=>b.classList.toggle('sel',+b.dataset.s===v)))}
+document.querySelectorAll('.sfxSeg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!window.SFX)return;SFX.set(+b.dataset.s);syncSfx();sfx('found')}));
+syncSfx();
 function refreshTitle(){
  const s=load('hc_klondike',null);
  $('contBtn').style.display=(s&&!s.won)?'block':'none';
@@ -489,7 +502,12 @@ function doMove(src,cards,dest,di){
  from.splice(from.length-cards.length,cards.length);
  const to=pileOf(dest,di);
  cards.forEach(c=>to.push(c));
- if(src.pile==='tab'&&from.length&&!from[from.length-1].up)from[from.length-1].up=true;
+ let rv=false;
+ if(src.pile==='tab'&&from.length&&!from[from.length-1].up){from[from.length-1].up=true;rv=true}
+ if(G.found.every(f=>f.length===13))sfx('clear');
+ else if(dest==='found')sfx(to.length===13?'group':'found');
+ else sfx('place');
+ if(rv)sfx('reveal',.12);
  afterMove();
 }
 function afterMove(fromStock){
@@ -504,11 +522,11 @@ function afterMove(fromStock){
 function tapStock(){
  if(G.stock.length){
   snap();
-  const c=G.stock.pop();c.up=true;G.waste.push(c);
+  const c=G.stock.pop();c.up=true;G.waste.push(c);sfx('flip');
   afterMove(true);watch.draw(false);
  }else if(G.waste.length){
   snap();
-  G.stock=G.waste.reverse().map(c=>(c.up=false,c)); G.waste=[];
+  G.stock=G.waste.reverse().map(c=>(c.up=false,c)); G.waste=[];sfx('recycle');
   afterMove(true);watch.draw(true);
  }
 }
@@ -542,7 +560,7 @@ function anyMove(){
 const watch=makeWatch({
  anyMove,total:()=>G.stock.length+G.waste.length,
  hintsLeft:()=>left('hint'),shufLeft:()=>left('shuf'),
- doShuffle:()=>{shuffleDown();useTool('shuf');watch.reset();watch.check()},
+ doShuffle:()=>{shuffleDown();sfx('shuffle');useTool('shuf');watch.reset();watch.check()},
  doNew:()=>{setPause(false);newGame();$('timeLbl').textContent='0:00';layout()}
 });
 
@@ -559,6 +577,7 @@ function tabTarget(src,cards){
  }
  return null;
 }
+function shake(cards){sfx('ng');cards.forEach(c=>{const e=els[c.id];e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')})}
 function findTarget(src,cards){return foundTarget(src,cards)||tabTarget(src,cards)}
 let tapWait=null, lastTap={id:-1,t:0};
 const DBL=450;
@@ -593,9 +612,9 @@ document.querySelector('.tools').addEventListener('click',e=>{
  const b=e.target.closest('.tb[data-k]'); if(!b||busy||!G||G.won||left(b.dataset.k)<=0)return;
  resume();
  const k=b.dataset.k;
- if(k==='hint'){if(hint())useTool('hint')}
- if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');render();persist();watch.reset()}
- if(k==='shuf'){shuffleDown();useTool('shuf');watch.reset();watch.check()}
+ if(k==='hint'){if(hint()){useTool('hint');sfx('hint')}}
+ if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');sfx('undo');render();persist();watch.reset()}
+ if(k==='shuf'){shuffleDown();sfx('shuffle');useTool('shuf');watch.reset();watch.check()}
 });
 function shuffleDown(){
  const pool=[];
@@ -644,7 +663,8 @@ function autoFinish(){
   if(!best){busy=false;render();return}
   G.tab[best.ci].pop();G.found[best.fi].push(best.c);G.moves++;
   render();
-  if(G.found.every(f=>f.length===13)){busy=false;persist();win();return}
+  if(G.found.every(f=>f.length===13)){sfx('clear');busy=false;persist();win();return}
+  sfx(G.found[best.fi].length===13?'group':'found');
   setTimeout(step,110);
  };
  step();
@@ -691,7 +711,7 @@ function endDrag(e){
  }else{
   if(!(d.src.pile==='tab'&&d.src.pi===col)&&canTab(d.cards[0],col)){doMove(d.src,d.cards,'tab',col);ok=true}
  }
- if(!ok)render();
+ if(!ok){render();if(!(d.src.pile==='tab'&&d.src.pi===col&&cy>=tabTop-ch*.15))sfx('ng')}
 }
 addEventListener('pointerup',endDrag);
 addEventListener('pointercancel',endDrag);
@@ -719,7 +739,7 @@ $('startBtn').onclick=startNew;
 $('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;G.draw=1;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game')};
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
 $('newBtn').onclick=()=>{setPause(false);if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
-$('pauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
+$('pauseBtn').onclick=()=>{if(G&&!G.won){setPause(!paused);sfx('pause')}};
 function openSheet(w){$('bgmBox').style.display=w?'block':'none';window.HCW&&HCW.syncBgm();$('sheetHow').innerHTML=document.querySelector(w?'#wHow':'.howto details').innerHTML.replace(/<summary>.*?<\/summary>/,'');syncAnim2();$('sheet').classList.add('on')}
 $('sheetBtn').onclick=()=>openSheet(false);
 $('sheetClose').onclick=()=>$('sheet').classList.remove('on');
@@ -750,7 +770,7 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
    if(recycled)cycles++;
    if(o.anyMove()){
     stuckDraws=-1;
-    if(cycles>=2&&!nudged&&o.hintsLeft()>0){nudged=true;toast('ヒントも使えるよ!!')}
+    if(cycles>=2&&!nudged&&o.hintsLeft()>0){nudged=true;toast('ヒントも使えるよ!!');sfx('nudge')}
     return;
    }
    if(stuckDraws<0){stuckDraws=0;return}
@@ -759,7 +779,7 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
    if(recycled&&stuckDraws>o.total())W.fire();
   },
   fire(){
-   stuckDraws=-1;
+   stuckDraws=-1;sfx('stuck');
    if(o.shufLeft()>0)dialog('これ以上進めないみたい。\nシャッフルしてみる？',[['シャッフルする',o.doShuffle],['タイトルへ戻る',()=>show('title')]]);
    else dialog('残念だけど、ここまでみたい。\nNEWゲームで始める？',[['NEWで始める',o.doNew],['タイトルへ戻る',()=>show('title')]]);
   },
@@ -767,7 +787,7 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
  };
  return W;
 }
-window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch};
+window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch,sfx};
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 })();
 </script>

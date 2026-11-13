@@ -25,28 +25,10 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearM3")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("clearPrev")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
- ['考え中：クリアのファンファーレ',[
-  ['clearM3','案M・もう少し高く','案Mを、さらにもう一段高くしたもの','both'],
-  ['clearM2','案M・少し高く','案Mを、少しだけ高くしたもの','both'],
-  ['clearM','案M（今の案を豪華に）','ゆったり上がって、和音でジャーン → きらきら','both'],
-  ['clearN','案N（和音で上がる）','ジャン・ジャン・ジャン・ジャーン（和音が4段で上がる）→ きらきら','both'],
-  ['clearO','案O（ためてジャーン）','だんだん大きく上がって、少しためてからジャーン → きらきら','both'],
-  ['clearL','案L','たたたらったら〜んっ ＋ きらきら','both'],
-  ['clearK','案K（J＋ぱんぱかぱーん）','上がる → 上がる → ぱんぱかぱーん → きらきら','both'],
-  ['clearI','案I（Fの3回目を今の案に）','上がる → 上がる → 今の案（上がってきらきら）','both'],
-  ['clearJ','案J（Iの3回目を高く始める）','上がる → 上がる → 高いところから上がってきらきら','both'],
-  ['clearG','案G（今の案＋D）','上がる → ぱんぱかぱーん → きらきら','both'],
-  ['clearH','案H（D＋今の案）','ぱんぱかぱーん → 上がる → きらきら','both'],
-  ['clearD','案D','ぱんぱかぱーん（短・短・短・長）＋きらきら','both'],
-  ['clearE','案E','ソ・ラ・シ・レー・シ・レーー（歌うようなメロディ）','both'],
-  ['clearF','案F','3回、だんだん高く上がる','both'],
-  ['clear','今の案','上がっていって、きらきらが響く','both'],
-  ['group','くらべる用：グループがそろう','きらきら','both'],
- ]],
  ['確定した音',[
   ['flip','山からカードをめくる','ぺらっ','both'],
   ['recycle','めくったカードを山に戻す','しゅっ','both'],
@@ -56,6 +38,7 @@ const L=[
   ['reveal','伏せたカードが表になる','ぽわっ','both'],
   ['title','タイトルを置き場に置く','ぽ・ぽーん','word'],
   ['group','グループがそろう／マークが K までそろう','きらきら','both'],
+  ['clear','クリア','ゆったり上がって、和音でジャーン → きらきら','both'],
   ['shuffle','シャッフル','しゃらしゃら','both'],
   ['hint','ヒント','ぴこっ','both'],
   ['undo','ひとつ戻る','しゅるっ','both'],

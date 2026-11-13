@@ -1,6 +1,6 @@
 /* 秘密のカード：グループ分けソリティア（試作） */
 (()=>{
-const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch}=window.HC;
+const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch,sfx}=window.HC;
 
 /* ---------- テーマ ---------- */
 /* テーマと言葉（5つより多いテーマは、ゲームのたびに5つをランダムに選ぶ）
@@ -451,9 +451,14 @@ function doMove(src,run,dest,di){
   if(c.t===1)G.slots[di]={title:c.id,names:[]};
   else run.forEach(p=>G.slots[di].names.push(p.id));
  }
- if(src.pile==='tab'&&from.length&&!from[from.length-1].up)from[from.length-1].up=true;
+ let rv=false;
+ if(src.pile==='tab'&&from.length&&!from[from.length-1].up){from[from.length-1].up=true;rv=true}
  G.moves++;G.started=true;clearHint();
  const s=dest==='slot'?G.slots[di]:null;
+ if(s&&s.names.length===NEED)sfx(G.done+1===G.groups?'clear':'group');
+ else if(dest==='slot')sfx(CARD[run[0].id].t===1?'title':'found');
+ else sfx('place');
+ if(rv)sfx('reveal',.12);
  render();persist();
  if(s&&s.names.length===NEED)completeSlot(di);else watch.real();
 }
@@ -469,8 +474,8 @@ function completeSlot(si){
 }
 function tapStock(){
  let rec=false;
- if(G.stock.length){snap();const p=G.stock.pop();p.up=true;G.waste.push(p)}
- else if(G.waste.length){snap();G.stock=G.waste.reverse().map(p=>(p.up=false,p));G.waste=[];rec=true}
+ if(G.stock.length){snap();const p=G.stock.pop();p.up=true;G.waste.push(p);sfx('flip')}
+ else if(G.waste.length){snap();G.stock=G.waste.reverse().map(p=>(p.up=false,p));G.waste=[];rec=true;sfx('recycle')}
  else return;
  G.moves++;G.started=true;clearHint();render();persist();
  watch.draw(rec);
@@ -499,7 +504,7 @@ function doShuffle(){
  const pool=[];G.tab.forEach(col=>col.forEach(p=>{if(!p.up)pool.push(p.id)}));G.stock.forEach(p=>pool.push(p.id));
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
  let n=0;G.tab.forEach(col=>col.forEach(p=>{if(!p.up)p.id=pool[n++]}));G.stock.forEach(p=>p.id=pool[n++]);
- undo=[];clearHint();useTool('shuf');render();persist();watch.reset();watch.check();
+ undo=[];clearHint();sfx('shuffle');useTool('shuf');render();persist();watch.reset();watch.check();
 }
 const watch=makeWatch({
  anyMove,total:()=>G.stock.length+G.waste.length,
@@ -507,7 +512,7 @@ const watch=makeWatch({
  doShuffle,
  doNew:()=>{setPause(false);newGame(G.mode);$('wTime').textContent='0:00';layout()}
 });
-function shake(run){run.forEach(p=>{const e=els[p.id];e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')})}
+function shake(run){sfx('ng');run.forEach(p=>{const e=els[p.id];e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')})}
 
 /* タップ：1回で下の列、2回で上の置き場 */
 let tapWait=null,lastTap={id:-1,t:0};
@@ -554,8 +559,8 @@ function useTool(k){G[k]=left(k)-1;renderTools();persist()}
 sec.querySelector('.tools').addEventListener('click',e=>{
  const b=e.target.closest('.tb[data-k]');if(!b||busy||!G||G.won||left(b.dataset.k)<=0)return;
  resume();const k=b.dataset.k;
- if(k==='hint'){const r=findHint();if(!r)return;clearHint();r.forEach(p=>els[p.id].classList.add('hint'));useTool('hint')}
- if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');render();persist();watch.reset()}
+ if(k==='hint'){const r=findHint();if(!r)return;clearHint();r.forEach(p=>els[p.id].classList.add('hint'));useTool('hint');sfx('hint')}
+ if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');sfx('undo');render();persist();watch.reset()}
  if(k==='shuf')doShuffle();
 });
 
@@ -592,7 +597,7 @@ function endDrag(){
  let ok=false;
  if(cy<tabTop-ch*.2){if(col<NSLOT&&canSlotAt(d.run,col)){doMove(d.src,d.run,'slot',col);ok=true}}
  else if(!(d.src.pile==='tab'&&d.src.pi===col)&&canTab(d.run,col)){doMove(d.src,d.run,'tab',col);ok=true}
- if(!ok)render();
+ if(!ok){render();if(!(d.src.pile==='tab'&&d.src.pi===col&&cy>=tabTop-ch*.2))sfx('ng')}
 }
 addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
 
@@ -656,7 +661,7 @@ function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';sh
 $('wStartBtn').onclick=start;
 $('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame');BGM.play(bgmName())};
 $('wMenuBtn').onclick=()=>{persist();BGM.stop();show('title')};
-$('wPauseBtn').onclick=()=>{if(G&&!G.won)setPause(!paused)};
+$('wPauseBtn').onclick=()=>{if(G&&!G.won){setPause(!paused);sfx('pause')}};
 $('wNewBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;setPause(false);newGame(G?G.mode:wMode);$('wTime').textContent='0:00';layout()};
 $('wSheetBtn').onclick=()=>openSheet(true);
 $('wAgainBtn').onclick=()=>{win.classList.remove('on');newGame(G.mode);$('wTime').textContent='0:00';layout()};
