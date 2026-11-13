@@ -223,6 +223,7 @@ const IMG={
  'カスタネット':'castanet',
  'つみき':'tsumiki',
  'ブロック':'block',
+ 'ぬいぐるみ':'nuigurumi',
  'ミニカー':'minicar',
  'プラモデル':'plamodel',
  'ルービックキューブ':'rubik',
