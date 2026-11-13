@@ -29,7 +29,8 @@ function hiss(t,dur,{vol=.25,f=2500,f2=null,q=1.2,type='bandpass',a=.004}={}){
 const S={
  flip(t){hiss(t,.09,{vol:.32,f:3200,f2:1400,q:.9});hiss(t+.02,.06,{vol:.12,f:6000,q:1.5})},              // めくる
  recycle(t){hiss(t,.32,{vol:.22,f:900,f2:3800,q:.7,a:.12});tone(330,t+.18,.18,{vol:.06,f2:440})},       // 山を戻す
- place(t){tone(196,t,.12,{type:'triangle',vol:.22,f2:150});hiss(t,.03,{vol:.12,f:1800,q:.8})},          // 列に置く
+ place(t){tone(587,t,.16,{type:'triangle',vol:.15});tone(880,t+.02,.18,{vol:.05})},                        // 列に置く（置き場と同じ「ぽん」の音で、低くやさしく）
+ placeOld(t){tone(196,t,.12,{type:'triangle',vol:.22,f2:150});hiss(t,.03,{vol:.12,f:1800,q:.8})},       // 列に置く・保存版（ことっ）
  found(t){tone(784,t,.22,{type:'triangle',vol:.2});tone(1175,t+.03,.25,{vol:.08})},                        // 置き場に置く
  ng(t){tone(165,t,.08,{type:'triangle',vol:.2,f2:140});tone(150,t+.09,.1,{type:'triangle',vol:.16,f2:120})},// 置けない
  reveal(t){hiss(t,.18,{vol:.1,f:2200,f2:4200,q:1,a:.06});tone(1047,t+.04,.25,{vol:.06})},              // 表になる

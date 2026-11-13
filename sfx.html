@@ -25,14 +25,15 @@ h2{font-size:15px;margin:18px 0 8px}
 <p class="note" id="ver"></p>
 <script>
 /* 古い音が残らないよう、毎回最新の効果音ファイルを読み込む */
-const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（タイトルの音："+(SFX.list.includes("titleChirin")?"新しい版":"古い版")+"）"};document.head.appendChild(sc);
+const sc=document.createElement("script");sc.src="sfx.js?v="+Date.now();sc.onload=()=>{document.getElementById("ver").textContent="効果音ファイル："+SFX.list.length+"種類を読み込みました（"+(SFX.list.includes("placeOld")?"最新版":"古い版")+"）"};document.head.appendChild(sc);
 </script>
 <script>
 const L=[
  ['いつも鳴る音',[
   ['flip','山からカードをめくる','ぺらっ（紙をめくる音）','both'],
   ['recycle','めくったカードを山に戻す','しゅっ（まとめる音）','both'],
-  ['place','カードを下の列に置く','ことっ（やさしく置く音）','both'],
+  ['place','カードを下の列に置く（新）','ぽん（置き場の音より低くやさしく）','both'],
+  ['placeOld','カードを下の列に置く（保存版）','ことっ','both'],
   ['found','カードを上の置き場に置く','ぽん（少し明るい音）','both'],
   ['ng','置けない場所に動かした','こつこつ（小さく低い音）','both'],
   ['reveal','伏せたカードが表になる','ふわっ（小さな音）','both'],
