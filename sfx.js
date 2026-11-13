@@ -32,7 +32,8 @@ const S={
  place(t){tone(587,t,.16,{type:'triangle',vol:.15});tone(880,t+.02,.18,{vol:.05})},                        // 列に置く（置き場と同じ「ぽん」の音で、低くやさしく）
  placeOld(t){tone(196,t,.12,{type:'triangle',vol:.22,f2:150});hiss(t,.03,{vol:.12,f:1800,q:.8})},       // 列に置く・保存版（ことっ）
  found(t){tone(784,t,.22,{type:'triangle',vol:.2});tone(1175,t+.03,.25,{vol:.08})},                        // 置き場に置く
- ng(t){tone(165,t,.08,{type:'triangle',vol:.2,f2:140});tone(150,t+.09,.1,{type:'triangle',vol:.16,f2:120})},// 置けない
+ ng(t){tone(330,t,.12,{type:'triangle',vol:.13,a:.008});tone(262,t+.13,.18,{type:'triangle',vol:.13,a:.008})}, // 置けない（ぽ・ぽ：やさしく下がる2音）
+ ngOld(t){tone(165,t,.08,{type:'triangle',vol:.2,f2:140});tone(150,t+.09,.1,{type:'triangle',vol:.16,f2:120})},// 置けない・保存版（こつこつ）
  reveal(t){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(392,t);o.frequency.exponentialRampToValueAtTime(784,t+.06);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.17,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g);g.connect(master);o.start(t);o.stop(t+.35);tone(784,t+.03,.25,{vol:.05,a:.02});}, // 表になる（ぽわっ：下から上へふくらむ音）
  reveal2(t){hiss(t,.35,{vol:.06,f:1200,f2:3600,q:.5,a:.12});tone(1568,t+.05,.6,{vol:.06,a:.06});tone(1319,t+.18,.7,{vol:.05,a:.06})}, // 表になる・案2（ふわっ：空気がふくらんで、やわらかい2音）
  revealOld(t){hiss(t,.18,{vol:.1,f:2200,f2:4200,q:1,a:.06});tone(1047,t+.04,.25,{vol:.06})},              // 表になる・保存版
@@ -47,8 +48,11 @@ const S={
  titleChirin(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
   st(2637,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く・保存版（ちりん）
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.15,a:.01});tone(f/2,tt,d*.5,{vol:.05,a:.012});tone(f*2,tt,d*.3,{vol:.02,a:.01})})}, // グループ・マークがそろう（きらきら）
- clear(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
-  [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア
+ clear(t){const k=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.01});tone(f/2,tt,d*.5,{vol:v*.33,a:.012});tone(f*2,tt,d*.3,{vol:v*.13,a:.01})};
+  [784,988,1175,1568,1976,2349,3136].forEach((f,i)=>k(f,t+i*.09,1,.12));
+  [1568,1976,2349,3136].forEach(f=>k(f,t+.75,3,.07))}, // クリア（グループがそろう音と同じ種類：上がっていって、和音で響く）
+ clearOld(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
+  [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});tone(2093,t+.6,1.4,{vol:.05,a:.02})}, // クリア・保存版
  ngB(t){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(330,t);o.frequency.exponentialRampToValueAtTime(196,t+.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g);g.connect(master);o.start(t);o.stop(t+.25)}, // 置けない・案B（ぽこっ：下がる音1つ）
  ngC(t){tone(330,t,.12,{type:'triangle',vol:.13,a:.008});tone(262,t+.13,.18,{type:'triangle',vol:.13,a:.008})}, // 置けない・案C（ぽ・ぽ：やさしく下がる2音）
  clearB(t){const n=[[392,0,.12],[392,.14,.12],[523,.28,.5]];n.forEach(([f,d,l])=>{tone(f,t+d,l,{type:'triangle',vol:.16,a:.01});tone(f*2,t+d,l*.6,{vol:.04,a:.01})});
