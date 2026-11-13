@@ -40,8 +40,8 @@ const S={
  pause(t){tone(880,t,.05,{vol:.1});tone(660,t+.05,.06,{vol:.08})},                                         // 一時停止・再開
  stuck(t){[784,659,523].forEach((f,i)=>tone(f,t+i*.14,.5,{type:'triangle',vol:.12}))},                    // 進めないお知らせ
  nudge(t){tone(784,t,.12,{vol:.13});tone(1175,t+.1,.22,{vol:.13})},                                        // ヒントも使えるよ
- title(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.002});tone(f*2.76,tt,d*.35,{vol:v*.3,a:.001});tone(f*5.4,tt,d*.15,{vol:v*.15,a:.001})};
-  st(1976,t,.8,.13);st(3136,t+.09,3.2,.15)}, // タイトルを置く（ち→りん、高い音へ上がって響く）
+ title(t){const st=(f,tt,d,v)=>{tone(f,tt,d,{vol:v,a:.012});tone(f*1.003,tt,d*.9,{vol:v*.5,a:.015});tone(f*2,tt,d*.3,{vol:v*.12,a:.01})};
+  st(1976,t,.7,.07);st(3136,t+.08,3.2,.11)}, // タイトルを置く（ち→りん、やわらかく上がって響く）
  group(t){[1568,1976,2349,3136,3951].forEach((f,i)=>{const tt=t+i*.1,d=i<4?1.1:3;tone(f,tt,d,{vol:.16,a:.003});tone(f/2,tt,d*.5,{vol:.05,a:.003});tone(f*2,tt,d*.3,{vol:.03,a:.002})})}, // グループ・マークがそろう（きらきら）
  clear(t){const n=[523,659,784,1047];n.forEach((f,i)=>tone(f,t+i*.12,.35,{type:'triangle',vol:.14}));
   [523,659,784].forEach(f=>tone(f,t+.55,1.6,{type:'triangle',vol:.1,a:.03}));tone(1047,t+.55,1.6,{vol:.08,a:.03});bell(2093,t+.6,.08,1.4)}, // クリア
