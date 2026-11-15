@@ -224,6 +224,7 @@ const IMG={
  'つみき':'tsumiki',
  'ブロック':'block',
  'ぬいぐるみ':'nuigurumi',
+ '寝袋':'nebukuro',
  '花火':'hanabi',
  '風鈴':'fuurin',
  'こいのぼり':'koinobori',
