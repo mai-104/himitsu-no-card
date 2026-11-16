@@ -615,7 +615,7 @@ document.querySelector('.tools').addEventListener('click',e=>{
  resume();
  const k=b.dataset.k;
  if(k==='hint'){if(hint()){useTool('hint');sfx('hint')}}
- if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');sfx('undo');render();persist();watch.reset()}
+ if(k==='undo'){if(!undo.length)return;autoArmed=false;const s=JSON.parse(undo.pop());Object.assign(G,s);clearHint();useTool('undo');sfx('undo');render();persist();watch.reset();watch.check()}
  if(k==='shuf'){shuffleDown();sfx('shuffle');useTool('shuf');watch.reset();watch.check()}
 });
 function shuffleDown(){
@@ -738,7 +738,7 @@ function win(){
 /* ボタン */
 function startNew(){setPause(false);newGame();$('timeLbl').textContent='0:00';show('game')}
 $('startBtn').onclick=startNew;
-$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;G.draw=1;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game')};
+$('contBtn').onclick=()=>{const s=load('hc_klondike',null);if(!s){startNew();return}G=s;G.draw=1;undo=[];setPause(false);$('timeLbl').textContent=fmt(G.time);show('game');watch.reset();setTimeout(()=>{if(!G.won)watch.check()},500)};
 $('menuBtn').onclick=()=>{if(G&&!G.won)persist();refreshTitle();show('title')};
 $('newBtn').onclick=()=>{setPause(false);if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;G=null;newGame();$('timeLbl').textContent='0:00';layout()};
 $('pauseBtn').onclick=()=>{if(G&&!G.won){setPause(!paused);sfx('pause')}};

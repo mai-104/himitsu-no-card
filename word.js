@@ -1027,7 +1027,7 @@ sec.querySelector('.tools').addEventListener('click',e=>{
  const b=e.target.closest('.tb[data-k]');if(!b||busy||!G||G.won||left(b.dataset.k)<=0)return;
  resume();const k=b.dataset.k;
  if(k==='hint'){const r=findHint();if(!r)return;clearHint();r.forEach(p=>els[p.id].classList.add('hint'));useTool('hint');sfx('hint')}
- if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');sfx('undo');render();persist();watch.reset()}
+ if(k==='undo'){if(!undo.length)return;Object.assign(G,JSON.parse(undo.pop()));clearHint();useTool('undo');sfx('undo');render();persist();watch.reset();watch.check()}
  if(k==='shuf')doShuffle();
 });
 
@@ -1151,7 +1151,7 @@ function refreshTitle(){
 $('wModeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;wMode=b.dataset.m;save('hc_wmode',wMode);refreshTitle()};
 function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';show('wgame');BGM.play(bgmName())}
 $('wStartBtn').onclick=start;
-$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame');BGM.play(bgmName())};
+$('wContBtn').onclick=()=>{const s=load(key(wMode),null);if(!s){start();return}G=s;undo=[];watch.reset();setPause(false);buildEls();$('wTime').textContent=fmt(G.time);show('wgame');BGM.play(bgmName());setTimeout(()=>{if(!G.won)watch.check()},500)};
 $('wMenuBtn').onclick=()=>{persist();BGM.stop();show('title')};
 $('wPauseBtn').onclick=()=>{if(G&&!G.won){setPause(!paused);sfx('pause')}};
 $('wNewBtn').onclick=()=>{if(G&&G.moves>0&&!G.won&&!confirm('今のゲームをやめて、新しく始めますか？'))return;setPause(false);newGame(G?G.mode:wMode);$('wTime').textContent='0:00';layout()};
