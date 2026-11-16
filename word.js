@@ -1046,7 +1046,7 @@ board.addEventListener('pointerdown',e=>{
  if(p==='waste'&&idx!==list.length-1)return;
  const run=p==='tab'?runAt(list,idx):[list[idx]];
  if(!run){if(lp)lp.onTap=()=>shake([list[idx]]);else shake([list[idx]]);return}
- drag={src:{pile:p,pi,idx},run,sx:e.clientX,sy:e.clientY,moved:false};e.preventDefault();
+ drag={src:{pile:p,pi,idx},run,sx:e.clientX,sy:e.clientY,moved:false,t0:performance.now()};e.preventDefault();
 });
 /* 長押しで、表になっているカードを大きく見る（重なったカードも見える） */
 let lp=null;const zoom=document.createElement('div');zoom.id='wZoom';sec.appendChild(zoom);
@@ -1080,7 +1080,7 @@ addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  d.run.forEach(p=>els[p.id].classList.remove('dragging'));
- if(!d.moved){onTap(d.src,d.run);return}
+ if(!d.moved||(Math.hypot(d.dx,d.dy)<22&&performance.now()-d.t0<400)){if(d.moved)render();onTap(d.src,d.run);return} // 少しすべった短いタップもタップ扱い
  const q=pos[d.run[0].id],cx=q.x+d.dx+cw/2,cy=q.y+d.dy+ch/2;
  const col=Math.max(0,Math.min(NCOL-1,Math.floor((cx-offX-gap/2)/(cw+gap))));
  let ok=false;

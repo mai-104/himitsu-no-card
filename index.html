@@ -713,7 +713,7 @@ board.addEventListener('pointerdown',e=>{
  if(!c||!c.up)return;
  if(p!=='tab'&&idx!==list.length-1)return;
  const cards=p==='tab'?list.slice(idx):[c];
- drag={src:{pile:p,pi,idx},cards,sx:e.clientX,sy:e.clientY,moved:false};
+ drag={src:{pile:p,pi,idx},cards,sx:e.clientX,sy:e.clientY,moved:false,t0:performance.now()};
  e.preventDefault();
 });
 addEventListener('pointermove',e=>{
@@ -728,7 +728,9 @@ function endDrag(e){
  if(!drag)return;
  const d=drag; drag=null;
  d.cards.forEach(c=>els[c.id].classList.remove('dragging'));
- if(!d.moved){
+ // 少しだけ指がすべった短いタップも、タップとして扱う
+ if(!d.moved||(Math.hypot(d.dx,d.dy)<22&&performance.now()-d.t0<400)){
+  if(d.moved)render();
   onTap(d.src,d.cards);
   return;
  }
