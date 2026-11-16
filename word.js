@@ -689,8 +689,8 @@ const css=`
 #wgame .wcard .fc{position:absolute;inset:0;display:none;background:#F7EED9;border:1px solid #cdbfae;border-radius:calc(var(--wh)*.14);box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;color:#3a3150}
 #wgame .wcard.up .fc{display:block}
 #wgame .wcard.up .bk{display:none}
-#wgame .wcard .pic{position:absolute;left:0;right:0;bottom:0;top:25%;background:center/cover no-repeat}
-#wgame .wcard .pic::before{content:"";position:absolute;left:0;right:0;top:0;height:22%;background:linear-gradient(#F7EED9,rgba(247,238,217,0))}
+#wgame .wcard .pic{position:absolute;left:0;right:0;bottom:0;top:25%;background:center 30%/cover no-repeat}
+#wgame .wcard .pic::before{content:"";position:absolute;left:0;right:0;top:0;height:7%;background:linear-gradient(#F7EED9,rgba(247,238,217,0))}
 #wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:25%;display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
 #wgame .wcard.ttl .fc{background:linear-gradient(180deg,#fff2c4,#ffd98a);border-color:#d9a640;color:#6b3e00}
 #wgame .wcard.ttl .wd{font-weight:800}
