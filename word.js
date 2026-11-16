@@ -922,7 +922,7 @@ function doMove(src,run,dest,di){
  if(src.pile==='tab'&&from.length&&!from[from.length-1].up){from[from.length-1].up=true;rv=true}
  G.moves++;G.started=true;clearHint();
  const s=dest==='slot'?G.slots[di]:null;
- if(s&&s.names.length===NEED)sfx(G.done+1===G.groups?'clear':'group');
+ if(s&&s.names.length===NEED)sfx('group');
  else if(dest==='slot')sfx(CARD[run[0].id].t===1?'title':'found');
  else sfx('place');
  if(rv)sfx('reveal',.12);

@@ -225,6 +225,7 @@ const BACKS=[{id:1,f:'back2.webp',n:'星と月',p:'⭐'},{id:3,f:'back4.webp',n:
 const curBack=()=>BACKS.find(b=>b.id===pref.back)||BACKS[0];
 function celebrate(host){
  host=host||document.body;
+ sfx('clear');
  const W=innerWidth,H=innerHeight,ps=[];let last=performance.now(),run=true;
  [[.22,.34,0],[.78,.27,600],[.5,.17,1200]].forEach(([bx,by,dl])=>setTimeout(()=>{
   for(let i=0;i<20;i++){const e=document.createElement('div');e.className='spark';petalFill(e);host.appendChild(e);
@@ -532,7 +533,7 @@ function doMove(src,cards,dest,di){
  cards.forEach(c=>to.push(c));
  let rv=false;
  if(src.pile==='tab'&&from.length&&!from[from.length-1].up){from[from.length-1].up=true;rv=true}
- if(G.found.every(f=>f.length===13))sfx('clear');
+ if(dest==='found'&&to.length===13)sfx('group');
  else if(dest==='found')sfx(to.length===13?'group':'found');
  else sfx('place');
  if(rv)sfx('reveal',.12);
@@ -692,7 +693,7 @@ function autoFinish(){
   if(!best){busy=false;render();return}
   G.tab[best.ci].pop();G.found[best.fi].push(best.c);G.moves++;
   render();
-  if(G.found.every(f=>f.length===13)){sfx('clear');busy=false;persist();win();return}
+  if(G.found.every(f=>f.length===13)){busy=false;persist();win();return}
   sfx(G.found[best.fi].length===13?'group':'found');
   setTimeout(step,110);
  };
