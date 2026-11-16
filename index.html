@@ -76,6 +76,10 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 #sheet h3{margin:0 0 6px;font-size:17px}
 #sheet .seg button{background:rgba(0,0,0,.06);color:var(--btnInk)}
 #sheet .big{background:var(--btnInk);color:var(--btn)}
+.row2{display:flex;gap:10px}.row2 .big{flex:1;margin-top:12px}
+.lbl{font-size:13px;font-weight:700;opacity:.85;margin:2px 0 6px}
+.qs{display:flex;gap:8px}.qb{width:34px;height:28px;border-radius:9px;padding:0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.qb.off{opacity:.45}.qb.off::after{content:"";position:absolute;left:6px;right:6px;top:50%;height:2px;background:currentColor;transform:rotate(-35deg)}
 .info{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 2px;font-size:14px;font-weight:700}
 #board{position:relative;flex:1;overflow:hidden;touch-action:none}
 .bar{display:flex;gap:6px;padding:8px 8px calc(env(safe-area-inset-bottom) + 10px);background:var(--bar)}
@@ -122,29 +126,10 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <div class="sub">（仮）ひとりで遊ぶトランプ</div>
 
  <div class="panel">
-  <h2>カードの背面をえらぶ</h2>
-  <div class="backs" id="backs"></div>
-  <h2 style="margin-top:14px">プレイ中の背景の動き</h2>
-  <div class="seg" id="animSeg">
-   <button data-a="1">動かす</button>
-   <button data-a="0">止める</button>
-  </div>
-  <h2 style="margin-top:14px">音楽</h2>
-  <div class="seg bgmSeg" id="bgmSeg">
-   <button data-b="1">♪ あり</button>
-   <button data-b="0">なし</button>
-  </div>
-  <h2 style="margin-top:14px">効果音</h2>
-  <div class="seg sfxSeg">
-   <button data-s="1">♪ あり</button>
-   <button data-s="0">なし</button>
-  </div>
- </div>
-
- <div class="panel">
   <h2>クラシック ソリティア</h2>
-  <button class="big" id="contBtn" style="display:none">続きから</button>
-  <button class="big" id="startBtn">はじめから</button>
+  <div class="lbl">カードの柄</div>
+  <div class="backs" id="backs"></div>
+  <div class="row2"><button class="big" id="startBtn">はじめから</button><button class="big" id="contBtn" style="display:none">つづきから</button></div>
  </div>
 
  <div class="panel">
@@ -153,8 +138,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
    <button data-m="n">ふつう</button>
  <button data-m="h">むずかしい</button>
   </div>
-  <button class="big" id="wContBtn" style="display:none">続きから</button>
-  <button class="big" id="wStartBtn">はじめから</button>
+  <div class="row2"><button class="big" id="wStartBtn">はじめから</button><button class="big" id="wContBtn" style="display:none">つづきから</button></div>
  </div>
 
  <div class="panel howto">
@@ -196,7 +180,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
   <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
   <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
  </div>
- <div class="info"><span id="movesLbl">0手</span><span id="timeLbl">0:00</span></div>
+ <div class="info"><span id="movesLbl">0手</span><span class="qs"><button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button></span><span id="timeLbl">0:00</span></div>
  <div id="board"><button id="autoBtn">おまかせで片付ける</button><div id="pauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
   <button id="menuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
@@ -256,18 +240,20 @@ BACKS.forEach((b,i)=>{
  $('backs').appendChild(bt);
 });
 
-function applyAnim(){[...$('animSeg').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}
-$('animSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.anim=+b.dataset.a;save('hc_pref',pref);applyAnim()};
+function applyAnim(){[...$('animSeg2').children].forEach(b=>b.classList.toggle('sel',+b.dataset.a===pref.anim))}
 applyBack();applyAnim();
 
 /* 効果音（両方のゲームで共通） */
 function sfx(n,d){if(window.SFX)SFX.play(n,d)}
 function syncSfx(){const v=window.SFX&&SFX.on?1:0;document.querySelectorAll('.sfxSeg').forEach(sg=>[...sg.children].forEach(b=>b.classList.toggle('sel',+b.dataset.s===v)))}
 document.querySelectorAll('.sfxSeg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!window.SFX)return;SFX.set(+b.dataset.s);syncSfx();sfx('found')}));
+function qSync(){const bOn=!!document.querySelector('#bgmSeg2 .sel[data-b="1"]'),sOn=!!(window.SFX&&SFX.on);document.querySelectorAll('.qBgm').forEach(b=>b.classList.toggle('off',!bOn));document.querySelectorAll('.qSfx').forEach(b=>{b.classList.toggle('off',!sOn);b.textContent=sOn?'🔊':'🔈'})}
+document.addEventListener('click',e=>{const q=e.target.closest('.qb');if(q){const on=!q.classList.contains('off');document.querySelector((q.classList.contains('qBgm')?'#bgmSeg2 [data-b="':'#sheet .sfxSeg [data-s="')+(on?0:1)+'"]').click()}setTimeout(qSync,0)},true);
+addEventListener('load',()=>setTimeout(qSync,60));
 syncSfx();
 function refreshTitle(){
  const s=load('hc_klondike',null);
- $('contBtn').style.display=(s&&!s.won)?'block':'none';
+ $('contBtn').style.display=(s&&!s.won)?'':'none';
 }
 refreshTitle();
 

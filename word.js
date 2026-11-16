@@ -739,7 +739,7 @@ sec.innerHTML=`
   <span id="wShufs"></span>
   <span id="wUndos"></span>
  </div>
- <div class="info"><span id="wMoves">0手</span><span id="wTime">0:00</span></div>
+ <div class="info"><span id="wMoves">0手</span><span class="qs"><button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button></span><span id="wTime">0:00</span></div>
  <div id="wboard" style="position:relative;flex:1;overflow:hidden;touch-action:none"><div id="wDone"></div><div id="wPauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
   <button id="wMenuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
@@ -1146,7 +1146,7 @@ syncBgm();
 let wMode=load('hc_wmode','n');
 function refreshTitle(){
  [...$('wModeSeg').children].forEach(b=>b.classList.toggle('sel',b.dataset.m===wMode));
- const s=load(key(wMode),null);$('wContBtn').style.display=(s&&!s.won)?'block':'none';
+ const s=load(key(wMode),null);$('wContBtn').style.display=(s&&!s.won)?'':'none';
 }
 $('wModeSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;wMode=b.dataset.m;save('hc_wmode',wMode);refreshTitle()};
 function start(){setPause(false);newGame(wMode);$('wTime').textContent='0:00';show('wgame');BGM.play(bgmName())}
