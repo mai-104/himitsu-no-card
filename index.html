@@ -21,6 +21,7 @@ body.t0{--bgA:#9fd4f5;--bgB:#fbdbe8;--ink:#4a3550;--bar:rgba(255,255,255,.55);--
 body.t1{--bgA:#120e30;--bgB:#33246a;--ink:#f3e9c4;--bar:rgba(10,8,30,.55);--btn:#3b2d78;--btnInk:#ffe8a3;--slot:rgba(255,232,163,.45)}
 body.wd{--bgA:#cdeaff;--bgB:#fff3e3;--ink:#4a4060;--bar:rgba(255,255,255,.55);--btn:#fff;--btnInk:#3e9c84;--slot:rgba(90,160,145,.55)}
 body.wn{--bgA:#23295e;--bgB:#6b5a9a;--ink:#f1ecff;--bar:rgba(20,18,50,.45);--btn:#4b3f86;--btnInk:#c9f2e4;--slot:rgba(220,230,255,.5)}
+body.t3{--bgA:#f7c9ce;--bgB:#eb96a1;--ink:#7a2246;--bar:rgba(255,255,255,.4);--btn:#fff;--btnInk:#ca4d79;--slot:rgba(255,255,255,.75)}
 body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:#eaffd0;--btnInk:#0b6a7d;--slot:rgba(220,255,180,.6)}
 
 .screen{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;background:linear-gradient(160deg,var(--bgA),var(--bgB));color:var(--ink)}
@@ -217,7 +218,9 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 <script src="sfx.js"></script>
 <script>
 (()=>{
-const BACKS=[{f:'back1.webp',n:'桜',p:'🌸'},{f:'back2.webp',n:'星と月',p:'⭐'},{f:'back3.webp',n:'金魚',p:'🫧'}];
+const BACKS=[{id:1,f:'back2.webp',n:'星と月',p:'⭐'},{id:3,f:'back4.webp',n:'雪の結晶',img:['snow_j.webp','snow_g.webp','snow_h.webp','snow_i.webp']}];
+const curBack=()=>BACKS.find(b=>b.id===pref.back)||BACKS[0];
+function petalFill(el){const b=curBack();if(b.img){const z=14+Math.random()*18;el.innerHTML=`<img src="${b.img[Math.floor(Math.random()*b.img.length)]}" style="width:${z}px;height:${z}px;display:block" alt="">`}else el.textContent=b.p}
 const SUIT=['♠︎','♥︎','♦︎','♣︎'];
 const RANK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const isRed=s=>s===1||s===2;
@@ -227,18 +230,19 @@ function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function del(k){try{localStorage.removeItem(k)}catch(e){}}
 
-const pref=Object.assign({back:0,draw:1,anim:1},load('hc_pref',{}));
+const pref=Object.assign({back:3,draw:1,anim:1},load('hc_pref',{}));
+if(pref.back!==1&&pref.back!==3)pref.back=3;
 
 /* ---------- タイトル画面 ---------- */
 function applyBack(){
  document.body.className='t'+pref.back;
- document.documentElement.style.setProperty('--back',`url(${BACKS[pref.back].f})`);
- [...$('backs').children].forEach((b,i)=>b.classList.toggle('sel',i===pref.back));
+ document.documentElement.style.setProperty('--back',`url(${curBack().f})`);
+ [...$('backs').children].forEach((b,i)=>b.classList.toggle('sel',BACKS[i].id===pref.back));
 }
 BACKS.forEach((b,i)=>{
  const bt=document.createElement('button');
  bt.innerHTML=`<img src="${b.f}" alt=""><span>${b.n}</span>`;
- bt.onclick=()=>{pref.back=i;save('hc_pref',pref);applyBack()};
+ bt.onclick=()=>{pref.back=b.id;save('hc_pref',pref);applyBack()};
  $('backs').appendChild(bt);
 });
 
@@ -279,14 +283,27 @@ const BG=(()=>{
   if(theme===0){for(let i=0;i<34;i++)P.push(petal(true))}
   if(theme===1){for(let i=0;i<80;i++)stars.push({x:R(0,W),y:R(0,H),r:R(.4,1.5),ph:R(0,6.3),sp:R(.6,2)})}
   if(theme===2){for(let i=0;i<24;i++)P.push(bubble(true))}
+  if(theme===3){for(let i=0;i<30;i++)P.push(flake(true))}
  }
  function petal(any){return{x:R(-20,W+20),y:any?R(-20,H):R(-60,-15),s:R(7,13),vy:R(18,42),vx:R(-6,14),ph:R(0,6.3),rot:R(0,6.3),vr:R(-1.5,1.5),fl:R(1.5,3.5),a:R(.55,.95)}}
  function cloud(any){return{x:any?R(-80,W):-160,y:R(H*.03,H*.75),s:R(.6,1.3),v:R(4,10),a:R(.5,.9)}}
  function fluff(any){return{x:R(0,W),y:any?R(0,H):H+R(5,40),r:R(1.2,3),vy:R(6,16),ph:R(0,6.3),c:['#ffffff','#fff1c9','#ffd9e4','#d8f5ea'][Math.floor(R(0,4))]}}
+ const FIMG=['snow_j.webp','snow_g.webp','snow_h.webp','snow_i.webp'].map(f=>{const m=new Image();m.src=f;return m});
+ function flake(any){const z=Math.random()<.2?R(26,40):R(9,22);return{x:R(-20,W+20),y:any?R(-40,H):R(-80,-30),z,vy:z*R(1.3,2.0)+6,ph:R(0,6.3),sw:R(6,18),rot:R(0,6.3),vr:R(-.5,.5),k:Math.floor(R(0,4)),a:R(.65,.95)}}
  function bubble(any){return{x:R(0,W),y:any?R(0,H+40):H+R(10,60),r:Math.random()<.75?R(1.5,4):R(4,8),vy:R(25,60),ph:R(0,6.3),w:R(4,12)}}
 
  function sky(c1,c2){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,c1);g.addColorStop(1,c2);x.fillStyle=g;x.fillRect(0,0,W,H)}
 
+ function drawSnow(dt){
+  sky('#f8d0d4','#eb96a1');
+  for(const p of P){
+   p.y+=p.vy*dt;p.x+=Math.sin(t*.7+p.ph)*p.sw*dt;p.rot+=p.vr*dt;
+   if(p.y>H+p.z){Object.assign(p,flake(false))}
+   const m=FIMG[p.k];if(!m.complete)continue;
+   x.save();x.translate(p.x,p.y);x.rotate(p.rot);x.globalAlpha=p.a;x.drawImage(m,-p.z/2,-p.z/2,p.z,p.z);x.restore();
+  }
+  x.globalAlpha=1;
+ }
  function drawSakura(dt){
   sky('#a6d7f5','#fde0ea');
   for(const p of P){
@@ -380,7 +397,7 @@ const BG=(()=>{
  function draw(dt){
   if(!W)return;
   if(theme!==want())init();
-  if(theme==='day')drawDay(dt);else if(theme==='night')drawNight(dt);else if(theme===0)drawSakura(dt);else if(theme===1)drawStars(dt);else drawWater(dt);
+  if(theme==='day')drawDay(dt);else if(theme==='night')drawNight(dt);else if(theme===0)drawSakura(dt);else if(theme===1)drawStars(dt);else if(theme===3)drawSnow(dt);else drawWater(dt);
  }
  function frame(now){
   raf=requestAnimationFrame(frame);
@@ -719,8 +736,7 @@ function win(){
  G.won=true; del('hc_klondike');
  $('winTxt').textContent=`手数 ${G.moves}　／　時間 ${fmt(G.time)}`;
  $('win').classList.add('on');
- const p=BACKS[pref.back].p;
- for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';s.textContent=p;s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
+ for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';petalFill(s);s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
 }
 
 /* ボタン */
@@ -777,7 +793,7 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
  };
  return W;
 }
-window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch,sfx};
+window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,petalFill,openSheet,makeWatch,sfx};
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 })();
 </script>

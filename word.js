@@ -1,6 +1,6 @@
 /* 秘密のカード：グループ分けソリティア（試作） */
 (()=>{
-const {$,load,save,del,pref,BG,show,fmt,BACKS,openSheet,makeWatch,sfx}=window.HC;
+const {$,load,save,del,pref,BG,show,fmt,BACKS,petalFill,openSheet,makeWatch,sfx}=window.HC;
 
 /* ---------- テーマ ---------- */
 /* テーマと言葉（5つより多いテーマは、ゲームのたびに5つをランダムに選ぶ）
@@ -1104,8 +1104,7 @@ function winGame(){
  G.won=true;del(key(G.mode));
  $('wWinTxt').textContent=`${MODES[G.mode].name}　${G.moves}手　／　${fmt(G.time)}`;
  win.classList.add('on');
- const p=BACKS[pref.back].p;
- for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';s.textContent=p;s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
+ for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';petalFill(s);s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
 }
 
 /* ---------- BGM（クラシック＝classic、グループ分けは昼＝ふつう、夜＝むずかしい。終わりと始まりを重ねてくり返す） ---------- */
