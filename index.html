@@ -225,7 +225,7 @@ const curBack=()=>BACKS.find(b=>b.id===pref.back)||BACKS[0];
 function celebrate(host){
  host=host||document.body;
  const W=innerWidth,H=innerHeight,ps=[];let last=performance.now(),run=true;
- [[.5,.2,0],[.22,.3,650],[.78,.32,1200]].forEach(([bx,by,dl])=>setTimeout(()=>{
+ [[.22,.34,0],[.78,.27,600],[.5,.17,1200]].forEach(([bx,by,dl])=>setTimeout(()=>{
   for(let i=0;i<20;i++){const e=document.createElement('div');e.className='spark';petalFill(e);host.appendChild(e);
    const a=i/20*6.283+Math.random()*.3,sp=170+Math.random()*230;
    ps.push({e,x:bx*W,y:by*H,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:Math.random()*360,vr:(Math.random()-.5)*160,ph:Math.random()*6.3,t:0,fv:35+Math.random()*30})}
