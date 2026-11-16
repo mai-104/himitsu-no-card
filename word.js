@@ -1108,7 +1108,7 @@ function winGame(){
  for(let i=0;i<26;i++){const s=document.createElement('div');s.className='petal';s.textContent=p;s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2.5+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6500)}
 }
 
-/* ---------- BGM（昼＝ふつう、夜＝むずかしい。終わりと始まりを重ねてくり返す） ---------- */
+/* ---------- BGM（クラシック＝classic、グループ分けは昼＝ふつう、夜＝むずかしい。終わりと始まりを重ねてくり返す） ---------- */
 const BGM=(()=>{
  const VOL=.45, FADE=3;
  let on=load('hc_bgm',1), cur=null, pair=[], tm=0, want=null;
@@ -1118,12 +1118,14 @@ const BGM=(()=>{
   const a=pair[cur]; if(!a||a.paused||!a.duration)return;
   if(a.currentTime>a.duration-FADE&&!a._x){a._x=1;const b=pair[1-cur];b._x=0;b.currentTime=0;b.volume=0;b.play().catch(()=>{});fadeTo(b,VOL,FADE*1000);fadeTo(a,0,FADE*1000);setTimeout(()=>{a.pause();a._x=0},FADE*1000+100);cur=1-cur}
  }
- function stopAll(){pair.forEach(a=>{fadeTo(a,0,600);setTimeout(()=>a.pause(),650)});clearInterval(tm);tm=0}
+ let pend=[];
+ function stopAll(){pair.forEach(a=>{fadeTo(a,0,600);pend.push(setTimeout(()=>a.pause(),650))});clearInterval(tm);tm=0}
  return{
   play(name){want=name;if(!on)return;
    const src='bgm/'+name+'.mp3';
    if(!pair.length||pair[0]._src!==src){pair.forEach(a=>a.pause());pair=[mk(src),mk(src)];pair.forEach(a=>a._src=src);cur=0}
-   const a=pair[cur];if(!a.paused)return;
+   pend.forEach(clearTimeout);pend=[];
+   const a=pair[cur];if(!a.paused){fadeTo(a,VOL,600);if(!tm)tm=setInterval(tick,200);return}
    a.play().then(()=>fadeTo(a,VOL,1200)).catch(()=>{});
    if(!tm)tm=setInterval(tick,200);
   },
@@ -1136,8 +1138,8 @@ const BGM=(()=>{
 })();
 const bgmName=()=>(G?G.mode:wMode)==='h'?'night':'day';
 function syncBgm(){document.querySelectorAll('.bgmSeg').forEach(sg=>[...sg.children].forEach(b=>b.classList.toggle('sel',+b.dataset.b===(BGM.on?1:0))))}
-document.querySelectorAll('.bgmSeg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;BGM.set(+b.dataset.b);if(+b.dataset.b&&sec.classList.contains('on'))BGM.play(bgmName());syncBgm()}));
-document.addEventListener('visibilitychange',()=>{if(document.hidden)BGM.pause();else if(sec.classList.contains('on'))BGM.resume()});
+document.querySelectorAll('.bgmSeg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;BGM.set(+b.dataset.b);if(+b.dataset.b&&sec.classList.contains('on'))BGM.play(bgmName());if(+b.dataset.b&&document.getElementById('game').classList.contains('on'))BGM.play('classic');syncBgm()}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)BGM.pause();else BGM.resume()});
 syncBgm();
 
 /* ---------- タイトル画面とボタン ---------- */
