@@ -78,7 +78,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 #sheet .big{background:var(--btnInk);color:var(--btn)}
 .row2{display:flex;gap:10px}.row2 .big{flex:1;margin-top:12px}
 .lbl{font-size:13px;font-weight:700;opacity:.85;margin:2px 0 6px}
-.qs{display:flex;gap:6px}.hrow{display:flex;align-items:center;justify-content:space-between}.tools .qb{width:30px;height:38px;border-radius:10px}.tools .qBgm{margin-left:2px}
+.qs{display:flex;gap:6px;align-items:center}.info .qs #movesLbl,.info .qs #wMoves{margin-left:6px}.hrow{display:flex;align-items:center;justify-content:space-between}.tools .qb{width:30px;height:38px;border-radius:10px}.tools .qBgm{margin-left:2px}
 #title{--bgA:#6a5bb5;--bgB:#9d92da;--ink:#fff;--bar:rgba(255,255,255,.16);--btn:#fff;--btnInk:#5f4fb0;--slot:rgba(255,255,255,.6)}
 #title .qb{background:rgba(255,255,255,.9);color:#5f4fb0}.qb{width:34px;height:28px;border-radius:9px;padding:0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .qb.off{opacity:.45}.qb.off::after{content:"";position:absolute;left:6px;right:6px;top:50%;height:2px;background:currentColor;transform:rotate(-35deg)}
@@ -161,7 +161,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
    <p>右上の山をタップするとカードがめくれます。何回でも回せます。</p>
    <p><b>1回タップ</b>で下の列へ、<b>2回タップ</b>で上の置き場へ動きます。ドラッグでも運べます。</p>
    <p>表になっているカードを<b>長押し</b>すると、大きく表示されます。重なっているカードも、名前のところを長押しすれば見られます。指をはなすと元に戻ります。</p>
-   <p>ふつう：12グループ（ヒント2・シャッフル1・戻る3）<br>むずかしい：14グループ（ヒント2・シャッフル1・戻る3）</p>
+   <p>ふつう：12グループ（ヒント3・シャッフル1・戻る3）<br>むずかしい：14グループ（ヒント3・シャッフル1・戻る3）</p>
   </details>
  </div>
 
@@ -173,7 +173,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 <section id="game" class="screen play">
  <div class="tools">
   <button class="tb menu" id="sheetBtn" aria-label="メニュー">≡</button>
-  <button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button>
+  <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
   <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
   <button class="tb hint" data-k="hint" aria-label="ヒント">💡</button>
   <span class="sp"></span>
@@ -182,7 +182,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
   <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
   <button class="tb undo" data-k="undo" aria-label="ひとつ戻る">↶</button>
  </div>
- <div class="info"><span id="movesLbl">0手</span><span id="timeLbl">0:00</span></div>
+ <div class="info"><span class="qs"><button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button><span id="movesLbl">0手</span></span><span id="timeLbl">0:00</span></div>
  <div id="board"><button id="autoBtn">おまかせで片付ける</button><div id="pauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
   <button id="menuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
@@ -197,7 +197,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
  <h3>遊び方</h3>
  <div id="sheetHow"></div>
  <h3 style="margin-top:12px">ボタン</h3>
- <p>💡 ヒント（2回）　🔀 シャッフル（1回）　↶ ひとつ戻る（3回）<br>使ったボタンは消えます。</p>
+ <p>💡 ヒント（3回）　🔀 シャッフル（1回）　↶ ひとつ戻る（3回）<br>使ったボタンは消えます。</p>
  <p>🔀 シャッフルは、場と山の<b>伏せてあるカードだけ</b>を混ぜ直します。表のカードと置き場のカードはそのままです。</p>
  <div id="bgmBox"><h3 style="margin-top:12px">音楽</h3>
  <div class="seg bgmSeg" id="bgmSeg2"><button data-b="1">♪ あり</button><button data-b="0">なし</button></div></div>
@@ -420,7 +420,7 @@ function newGame(){
  const deck=[];
  for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({id:s*13+r-1,s,r,up:false});
  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
- G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:1,started:false,won:false,hint:2,undo:3,shuf:1};
+ G={stock:[],waste:[],found:[[],[],[],[]],tab:[[],[],[],[],[],[],[]],moves:0,time:0,draw:1,started:false,won:false,hint:3,undo:3,shuf:1};
  for(let i=0;i<7;i++)for(let j=0;j<=i;j++){const c=deck.pop();c.up=(j===i);G.tab[i].push(c)}
  G.stock=deck;
  undo=[];

@@ -151,8 +151,8 @@ const NG=[
 ];
 /* モードの設定（数字を変えるだけで調整できる） */
 const MODES={
- n:{name:'ふつう',groups:12,per:5,ups:[5,4,3,2,1],hint:2,shuf:1,undo:3},
- h:{name:'むずかしい',groups:14,per:6,ups:[5,4,3,2,1],hint:2,shuf:1,undo:3},
+ n:{name:'ふつう',groups:12,per:5,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
+ h:{name:'むずかしい',groups:14,per:6,ups:[5,4,3,2,1],hint:3,shuf:1,undo:3},
 };
 const NSLOT=4, NCOL=5, NEED=5;
 /* カードの絵（言葉 → img/のファイル名。同じ言葉が別テーマにもあるときは 'テーマ/言葉' で指定）。tools/make_card_img.py で作って、ここに1行足す */
@@ -734,13 +734,12 @@ sec.id='wgame';sec.className='screen play';
 sec.innerHTML=`
  <div class="tools">
   <button class="tb menu" id="wSheetBtn" aria-label="メニュー">≡</button>
-  <button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button>
   <span id="wHints"></span>
   <span class="sp"></span>
   <span id="wShufs"></span>
   <span id="wUndos"></span>
  </div>
- <div class="info"><span id="wMoves">0手</span><span id="wTime">0:00</span></div>
+ <div class="info"><span class="qs"><button class="qb qBgm" aria-label="音楽">♪</button><button class="qb qSfx" aria-label="効果音">🔊</button><span id="wMoves">0手</span></span><span id="wTime">0:00</span></div>
  <div id="wboard" style="position:relative;flex:1;overflow:hidden;touch-action:none"><div id="wDone"></div><div id="wPauseLbl">一時停止中<small>カードにさわると再開します</small></div></div>
  <div class="bar">
   <button id="wMenuBtn" style="flex:2"><small>⌂</small>タイトルへ戻る</button>
