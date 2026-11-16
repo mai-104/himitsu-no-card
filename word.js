@@ -256,6 +256,7 @@ const IMG={
  'つみき':'tsumiki',
  'ブロック':'block',
  'ぬいぐるみ':'nuigurumi',
+ 'くやしい':'kuyashii',
  'うれしい':'ureshii',
  'かなしい':'kanashii',
  'こわい':'kowai',
