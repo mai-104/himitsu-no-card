@@ -911,6 +911,8 @@ function persist(){if(G)save(key(G.mode),G)}
 function snap(){undo.push(JSON.stringify({stock:G.stock,waste:G.waste,slots:G.slots,tab:G.tab,done:G.done,cleared:G.cleared,moves:G.moves}));if(undo.length>300)undo.shift()}
 
 /* ---------- カードの見た目 ---------- */
+/* 絵の読み込みに失敗したら、少し待って読み直す（電波が不安定なとき用） */
+function ensurePics(){document.querySelectorAll('#wgame .wcard .pic').forEach(d=>{const m=/url\(["']?(img\/[^"')?]+)/.exec(d.style.backgroundImage);if(!m)return;const u=m[1];let n=0;const tryLoad=()=>{const im=new Image();im.onload=()=>{d.style.backgroundImage=`url("${im.src}")`};im.onerror=()=>{if(++n<=4)setTimeout(tryLoad,800*n)};im.src=n?u+'?r='+n:u};tryLoad()})}
 function buildEls(){
  board.querySelectorAll('.wcard,.wslot').forEach(e=>e.remove());
  els={};pos={};CARD={};
@@ -925,6 +927,7 @@ function buildEls(){
  });
  for(let i=0;i<NSLOT;i++){const d=document.createElement('div');d.className='wslot';d.dataset.pile='slot';d.dataset.pi=i;d.textContent='タイトルを\n置く';d.style.whiteSpace='pre';board.appendChild(d);slotEls[i]=d}
  const s=document.createElement('div');s.className='wslot';s.dataset.pile='stock';s.textContent='↻';board.appendChild(s);slotEls.stock=s;
+ ensurePics();
 }
 const slotEls={};
 
