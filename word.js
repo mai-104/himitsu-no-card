@@ -816,6 +816,7 @@ body.t0{--tapeA:#ff9fbf;--tapeB:rgba(255,255,255,.55)}
 body.t1{--tapeA:#2c3f8f;--tapeB:rgba(255,215,120,.6)}
 body.t2{--tapeA:#59c4ee;--tapeB:rgba(210,255,150,.6)}
 body.wd{--tapeA:#ffb6a3;--tapeB:rgba(255,255,255,.6)}
+body.wd #wgame .wcard .bk{background:url(wback_day.webp) center/100% 100% no-repeat;border-color:#fff}
 body.wn #wgame .wcard .bk{background:url(wback_night.webp) center/100% 100% no-repeat;border-color:#e9d9a8}
 body.wn{--tapeA:#f2c46b;--tapeB:rgba(255,255,255,.55)}
 #wDone{position:absolute;left:0;right:0;bottom:6px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:0 6px;z-index:5;pointer-events:none}
