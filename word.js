@@ -1023,8 +1023,12 @@ function tabTarget(src,run){
 }
 
 function doMove(src,run,dest,di){
- snap();
+ if(!G||G.won||busy)return;
  const from=pileOf(src.pile,src.pi);
+ // 古い操作（タップ待ちなど）で、もう別の場所にあるカードを動かさない
+ if(!from||from.length<run.length||run.some((p,k)=>from[from.length-run.length+k].id!==p.id))return;
+ if(dest==='slot'&&CARD[run[0].id].t===1&&(G.slots[di]||G.slots.some(x=>x&&x.title===run[0].id)||(G.cleared||[]).includes(CARD[run[0].id].label)))return;
+ snap();
  from.splice(from.length-run.length,run.length);
  if(dest==='tab')run.forEach(p=>G.tab[di].push({id:p.id,up:true}));
  else{
@@ -1044,7 +1048,7 @@ function doMove(src,run,dest,di){
  if(s&&s.names.length===NEED)completeSlot(di);else watch.real();
 }
 function completeSlot(si){
- const s=G.slots[si]; busy=true;
+ const s=G.slots[si]; busy=true;if(tapWait){clearTimeout(tapWait);tapWait=null}lastTap={id:-1,t:0};
  [s.title,...s.names].forEach(id=>{const e=els[id];e.classList.add('gone');e.style.transform+=' scale(1.25)'});
  setTimeout(()=>{
   [s.title,...s.names].forEach(id=>{els[id].classList.remove('gone')});
