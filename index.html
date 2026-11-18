@@ -384,13 +384,14 @@ const BG=(()=>{
    const sx2=1+.07*Math.sin(t*c.fs+c.ph),sy2=1-.06*Math.sin(t*c.fs*1.3+c.ph+1);
    x.globalAlpha=c.a;x.drawImage(m,c.x,c.y-h*sy2/2,w*sx2,h*sy2)}
   x.globalAlpha=1;
-  // 菜の花畑（下にしきつめる）
-  const fm=DI.day_field;
-  if(ok(fm)){const fh=H*.13,fw=fm.naturalWidth*fh/fm.naturalHeight;let k=0;
-   for(let fx=-fw*.3;fx<W;fx+=fw*.98,k++){x.save();if(k%2){x.translate(fx+fw,0);x.scale(-1,1);x.drawImage(fm,0,H-fh,fw,fh)}else x.drawImage(fm,fx,H-fh,fw,fh);x.restore()}}
-  // 両はしの桜
+  // 両はしの桜（菜の花の後ろ）
   for(const [n,side] of [['day_tree_l',0],['day_tree_r',1]]){const m=DI[n];if(!ok(m))continue;
-   const th=H*.25,tw=m.naturalWidth*th/m.naturalHeight,tx=side?W-tw*.72:-tw*.28;x.drawImage(m,tx,H-th-H*.02,tw,th)}
+   const th=H*.26,tw=m.naturalWidth*th/m.naturalHeight,tx=side?W-tw*.62:-tw*.38;x.drawImage(m,tx,H-th-H*.095,tw,th)}
+  // 菜の花畑（2段に重ねてかさ増し）
+  const fm=DI.day_field;
+  if(ok(fm)){const fh=H*.125,fw=Math.max(W*1.1,fm.naturalWidth*fh/fm.naturalHeight);
+   x.save();x.translate((W+fw)/2,0);x.scale(-1,1);x.drawImage(fm,0,H-fh-H*.075,fw,fh);x.restore();
+   x.drawImage(fm,(W-fw)/2+W*.04,H-fh+H*.005,fw,fh)}
   // 舞う花びら
   for(const p of P){
    p.y+=p.vy*dt; p.x+=(p.vx+Math.sin(t*.8+p.ph)*16)*dt; p.rot+=p.vr*dt;
