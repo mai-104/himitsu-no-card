@@ -866,7 +866,7 @@ function makeWatch(o){ // o: anyMove(), total(), hintsLeft(), shufLeft(), doShuf
  return W;
 }
 window.HC={$,load,save,del,pref,BG,show,fmt,BACKS,petalFill,celebrate,openSheet,makeWatch,sfx};
-if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{r.active&&r.active.postMessage('fill')}).catch(()=>{}))}
 })();
 </script>
 <script src="word.js"></script>
