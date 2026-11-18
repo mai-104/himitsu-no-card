@@ -1,4 +1,4 @@
-const CACHE='card-v117';
+const CACHE='card-v118';
 const FILES=['./','index.html','word.js','sfx.js','bgm/day.mp3','bgm/night.mp3','bgm/classic.mp3','manifest.json','back2.webp','back4.webp','wback_night.webp','wback_day.webp','snow_j.webp','snow_g.webp','snow_h.webp','snow_i.webp','bg/day_sky.webp','bg/day_tree_l.webp','bg/day_tree_r.webp','bg/day_field.webp','bg/day_sun.webp','bg/day_cloud1.webp','bg/day_cloud2.webp','bg/day_cloud3.webp','bg/day_cloud4.webp','bg/night_sky.webp','bg/night_town.webp','bg/night_moon.webp','bg/snow_hill.webp','bg/star_sky1.webp','fx/cstar_b.webp','fx/cstar_m.webp','fx/cstar_p.webp','fx/cstar_v.webp','fx/cstar_y.webp','fx/nano_f.webp','fx/nano_p.webp','fx/snowp_g.webp','fx/snowp_h.webp','fx/snowp_i.webp','fx/snowp_j.webp','fx/spk_blue.webp','fx/spk_gold.webp','fx/spk_lav.webp','fx/spk_pink.webp','fx/spk_white.webp','icon-192.png','icon-512.png'];
 const IMGC='card-img';
 // 言葉カードの絵（遊んでいない間に少しずつ保存して、オフラインでも絵が出るようにする）
