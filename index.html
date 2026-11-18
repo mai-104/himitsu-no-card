@@ -386,7 +386,7 @@ const BG=(()=>{
   x.globalAlpha=1;
   // 両はしの桜（菜の花の後ろ）
   for(const [n,side] of [['day_tree_l',0],['day_tree_r',1]]){const m=DI[n];if(!ok(m))continue;
-   const th=H*.26,tw=m.naturalWidth*th/m.naturalHeight,tx=side?W-tw*.62:-tw*.38;x.drawImage(m,tx,H-th-H*.04,tw,th)}
+   const th=H*.26,tw=m.naturalWidth*th/m.naturalHeight,tx=side?W-tw*.62:-tw*.38;x.drawImage(m,tx,H-th-H*.095,tw,th)}
   // 菜の花畑（2段に重ねてかさ増し）
   const fm=DI.day_field;
   if(ok(fm)){const fh=H*.125,fw=Math.max(W*1.1,fm.naturalWidth*fh/fm.naturalHeight);
