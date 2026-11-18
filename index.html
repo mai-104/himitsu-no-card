@@ -718,7 +718,7 @@ function findHint(){
   const tg=findTarget(t,t.cards);
   if(!tg)continue;
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&t.cards[0].r===13&&!G.tab[tg[1]].length&&G.tab[t.pi][t.idx-1].up)continue;
-  if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&G.tab[t.pi][t.idx-1].up){const p=G.tab[t.pi][t.idx-1];const pool=[...G.stock,...G.waste];const helps=[0,1,2,3].some(f=>canFound(p,f))||pool.some(q=>isRed(q.s)!==isRed(p.s)&&q.r===p.r-1);if(isRed(p.s)!==isRed(t.cards[0].s)&&p.r===t.cards[0].r+1&&!helps)continue}
+  if(t.pile==='tab'&&tg[0]==='tab'&&t.idx>0&&G.tab[t.pi][t.idx-1].up){const p=G.tab[t.pi][t.idx-1];const fits=q=>q&&isRed(q.s)!==isRed(p.s)&&q.r===p.r-1;const wt=G.waste[G.waste.length-1];const runOk=G.tab.some((col,cj)=>cj!==t.pi&&col.some((q,j)=>q.up&&(j===0||!col[j-1].up)&&(j>0||col.length)&&fits(q)&&(j>0)));const helps=[0,1,2,3].some(f=>canFound(p,f))||fits(wt)||runOk;if(isRed(p.s)!==isRed(t.cards[0].s)&&p.r===t.cards[0].r+1&&!helps)continue}
   if(t.pile==='tab'&&tg[0]==='tab'&&t.idx===0&&t.cards[0].r===13&&!G.tab[tg[1]].length)continue;
   return t.cards;
  }
