@@ -403,7 +403,7 @@ const BG=(()=>{
   const ev=Math.pow(prog,1.4);
   if(ev>0){const g=x.createLinearGradient(0,H,0,0);g.addColorStop(0,`rgba(255,150,100,${.45*ev})`);g.addColorStop(.55,`rgba(255,185,150,${.3*ev})`);g.addColorStop(1,`rgba(200,160,220,${.18*ev})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
   // 太陽：左上の高い位置から、右下の桜の上へ沈んでいく
-  const q=1-prog,sm=DI.day_sun,sz=W*(.19+.03*prog),sx=W*(q*q*.12+2*q*prog*.5+prog*prog*.92),sy=H*(q*q*.25+2*q*prog*.58+prog*prog*.64);
+  const q=1-prog,sm=DI.day_sun,sz=W*(.19+.03*prog),sx=W*(q*q*.1+2*q*prog*.5+prog*prog*.92),sy=H*(q*q*.53+2*q*prog*.47+prog*prog*.66);
   if(ev>0){const gl=x.createRadialGradient(sx,sy,sz*.2,sx,sy,sz*1.6);gl.addColorStop(0,`rgba(255,140,60,${.55*ev})`);gl.addColorStop(1,'rgba(255,140,60,0)');x.fillStyle=gl;x.fillRect(sx-sz*2,sy-sz*2,sz*4,sz*4)}
   if(ok(sm))x.drawImage(sm,sx-sz/2,sy-sz/2,sz,sz);
   if(ev>0){x.save();x.globalCompositeOperation='source-atop';x.restore()}
