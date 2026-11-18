@@ -391,7 +391,7 @@ const BG=(()=>{
   x.beginPath();x.arc(0,0,26,0,6.3);x.arc(30,-12,32,0,6.3);x.arc(64,0,26,0,6.3);x.arc(32,10,28,0,6.3);x.fill();x.restore();
  }
  const DI={};['day_sky','day_tree_l','day_tree_r','day_field','day_sun','day_cloud1','day_cloud2','day_cloud3','day_cloud4','night_sky','night_town','night_moon','snow_hill','star_sky1'].forEach(n=>{const m=new Image();m.src='bg/'+n+'.webp';DI[n]=m});
- let prog=0,progT=0;
+ let prog=0,progT=0,sunY=.53;
  const ok=m=>m&&m.complete&&m.naturalWidth;
  function cover(m){const s=Math.max(W/m.naturalWidth,H/m.naturalHeight),w=m.naturalWidth*s,h=m.naturalHeight*s;x.drawImage(m,(W-w)/2,(H-h)/2,w,h)}
  function dcloud(any){return{k:1+Math.floor(R(0,4)),x:any?R(-W*.2,W*.9):-W*.6,y:R(H*.2,H*.62),w:R(W*.3,W*.52),v:R(4,9),a:R(.7,.92),ph:R(0,6.3),fs:R(.12,.3)}}
@@ -403,7 +403,7 @@ const BG=(()=>{
   const ev=Math.pow(prog,1.4);
   if(ev>0){const g=x.createLinearGradient(0,H,0,0);g.addColorStop(0,`rgba(255,150,100,${.45*ev})`);g.addColorStop(.55,`rgba(255,185,150,${.3*ev})`);g.addColorStop(1,`rgba(200,160,220,${.18*ev})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
   // 太陽：左上の高い位置から、右下の桜の上へ沈んでいく
-  const q=1-prog,sm=DI.day_sun,sz=W*(.19+.03*prog),sx=W*(q*q*.1+2*q*prog*.5+prog*prog*.92),sy=H*(q*q*.53+2*q*prog*.47+prog*prog*.66);
+  const q=1-prog,sm=DI.day_sun,sz=W*(.19+.03*prog),sx=W*(q*q*.1+2*q*prog*.5+prog*prog*.92),sy=q*q*(sunY*H+sz*.42)+2*q*prog*H*Math.max(.47,sunY+.04)+prog*prog*H*.66;
   if(ev>0){const gl=x.createRadialGradient(sx,sy,sz*.2,sx,sy,sz*1.6);gl.addColorStop(0,`rgba(255,140,60,${.55*ev})`);gl.addColorStop(1,'rgba(255,140,60,0)');x.fillStyle=gl;x.fillRect(sx-sz*2,sy-sz*2,sz*4,sz*4)}
   if(ok(sm))x.drawImage(sm,sx-sz/2,sy-sz/2,sz,sz);
   if(ev>0){x.save();x.globalCompositeOperation='source-atop';x.restore()}
@@ -475,6 +475,7 @@ const BG=(()=>{
   stop(){cancelAnimationFrame(raf);raf=0},
   setOv(v){ov=v},
   cur(){return want()},
+  setSunY(v){sunY=v},
   setProg(v,jump){progT=Math.max(0,Math.min(1,v));if(jump)prog=progT;if(!raf&&W)draw(0)},
   resize(){if(cv.clientWidth)resize()}
  };

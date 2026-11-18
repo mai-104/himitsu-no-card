@@ -987,6 +987,7 @@ function render(){
  G.cards.filter(c=>c.t).forEach(c=>{if(!G.slots.some(s=>s&&s.title===c.id))els[c.id].querySelector('.ln').textContent=''});
  slotEls.stock.textContent=G.stock.length?'':(G.waste.length?'↻':'');
  $('wMoves').textContent=G.moves+'手';
+ if(render._sy!==G){render._sy=G;let b=0;const bd=$('wboard')||els[G.tab[0][0].id].offsetParent,top=bd?bd.getBoundingClientRect().top:0;G.tab.forEach(col=>col.forEach(p=>{const y=pos[p.id]&&pos[p.id].y+els[p.id].offsetHeight;if(y>b)b=y}));if(b)BG.setSunY((b+top)/innerHeight)}
  renderTools();
 }
 
