@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2b2350">
 <title>秘密のカード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{--cw:50px;--ch:72px;--back:url(back1.webp)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,input{font-family:inherit}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;
- font-family:"Hiragino Maru Gothic ProN","M PLUS Rounded 1c","Kosugi Maru","Noto Sans JP",system-ui,sans-serif;
+ font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Noto Sans JP",system-ui,sans-serif;
  -webkit-user-select:none;user-select:none}
 body{background:#2b2350;color:#fff}
 button{font:inherit;border:0;cursor:pointer}
@@ -80,6 +83,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 .row2{display:flex;gap:10px}.row2 .big{flex:1;margin-top:12px}
 .lbl{font-size:13px;font-weight:700;opacity:.85;margin:2px 0 6px}
 .qs{display:flex;gap:6px;align-items:center}.info .qs #movesLbl,.info .qs #wMoves{margin-left:6px}.hrow{display:flex;align-items:center;justify-content:space-between}.tools .qb{width:30px;height:38px;border-radius:10px}.tools .qBgm{margin-left:2px}
+#title,#title button{font-family:"M PLUS Rounded 1c","Zen Maru Gothic",sans-serif}
 #title{--bgA:#6a5bb5;--bgB:#9d92da;--ink:#fff;--bar:rgba(255,255,255,.16);--btn:#fff;--btnInk:#5f4fb0;--slot:rgba(255,255,255,.6)}
 #title .qb{background:rgba(255,255,255,.9);color:#5f4fb0}.qb{width:34px;height:28px;border-radius:9px;padding:0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .qb.off{opacity:.45}.qb.off::after{content:"";position:absolute;left:6px;right:6px;top:50%;height:2px;background:currentColor;transform:rotate(-35deg)}
