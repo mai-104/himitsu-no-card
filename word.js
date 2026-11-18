@@ -957,6 +957,7 @@ function place(p,x,y,z,pile,pi,idx){
  el.dataset.pile=pile;el.dataset.pi=pi;el.dataset.idx=idx;
 }
 function render(){
+ {const placed=G.done*(NEED+1)+G.slots.reduce((a,s)=>a+(s?1+s.names.length:0),0);BG.setProg(G.won?1:placed/G.cards.length,!render._g||render._g!==G);render._g=G}
  const vis=new Set();
  G.stock.forEach((p,i)=>{place(p,colX(4),y0,10+i,'stock',0,i);vis.add(p.id)});
  G.waste.forEach((p,i)=>{place(p,colX(4),yW,10+i,'waste',0,i);vis.add(p.id)});
