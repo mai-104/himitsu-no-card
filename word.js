@@ -1,4 +1,4 @@
-/* 秘密のカード：グループ分けソリティア（試作） */
+/* 秘密のカードならべ：ワードソリティア */
 (()=>{
 const {$,load,save,del,pref,BG,show,fmt,BACKS,petalFill,celebrate,openSheet,makeWatch,sfx}=window.HC;
 
