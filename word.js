@@ -521,7 +521,7 @@ const IMG={
  'うどん':'udon',
  'そば':'soba',
  '麺料理/焼きそば':'yakisoba',
- '屋台/焼きそば':'yakisoba',
+ '屋台/焼きそば':'yatai_yakisoba',
  'そうめん':'soumen',
  '冷やし中華':'hiyashichuka',
  'たまごサンド':'tamagosand',
