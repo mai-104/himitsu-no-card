@@ -452,7 +452,7 @@ const BG=(()=>{
   const p=prog,q=1-p,mxp=q*q*W*.06+2*q*p*W*.36+p*p*W*.88,myp=q*q*H*.88+2*q*p*H*.5+p*p*H*.6;
   const r=W*.085,k=.1+.9*p,e=1-2*k,mm=DI.night_moon;
   const gl=x.createRadialGradient(mxp,myp,r*.8,mxp,myp,r*3.2);gl.addColorStop(0,`rgba(255,240,200,${.15+.3*k})`);gl.addColorStop(1,'rgba(255,240,200,0)');x.fillStyle=gl;x.fillRect(mxp-r*4,myp-r*4,r*8,r*8);
-  if(ok(mm)){const S=Math.ceil(r*2*dpr)+2;mc.width=mc.height=S;const R0=S/2-1;
+  if(ok(mm)){const S=Math.ceil(r*2*dpr)+2;if(mc.width!==S){mc.width=mc.height=S}else mx.clearRect(0,0,S,S);const R0=S/2-1;
    mx.globalAlpha=.13;mx.drawImage(mm,1,1,S-2,S-2);mx.globalAlpha=1;
    mx.save();mx.beginPath();mx.arc(S/2,S/2,R0,-Math.PI/2,Math.PI/2,true);mx.ellipse(S/2,S/2,R0*Math.abs(e),R0,0,Math.PI/2,-Math.PI/2,e<0);mx.clip();mx.drawImage(mm,1,1,S-2,S-2);mx.restore();
    x.drawImage(mc,mxp-r,myp-r,r*2,r*2)}

@@ -1229,7 +1229,11 @@ const BGM=(()=>{
  function fadeTo(a,v,ms){const s=a.volume,t0=performance.now();const st=()=>{const k=Math.min(1,(performance.now()-t0)/ms);a.volume=Math.max(0,Math.min(1,s+(v-s)*k));if(k<1)a._f=requestAnimationFrame(st)};cancelAnimationFrame(a._f);st()}
  function tick(){
   const a=pair[cur]; if(!a||a.paused||!a.duration)return;
-  if(a.currentTime>a.duration-FADE&&!a._x){a._x=1;const b=pair[1-cur];b._x=0;b.currentTime=0;b.volume=0;b.play().catch(()=>{});fadeTo(b,VOL,FADE*1000);fadeTo(a,0,FADE*1000);setTimeout(()=>{a.pause();a._x=0},FADE*1000+100);cur=1-cur}
+  // 次の再生を少し早めに準備して、実際に鳴り始めてからクロスフェードする（途切れ防止）
+  const b=pair[1-cur];
+  if(a.currentTime>a.duration-FADE-1.2&&!a._x){a._x=1;b._x=0;b.pause();b.currentTime=0;b.volume=0;b._ok=0;
+   const go=()=>{if(b._ok)return;b._ok=1;fadeTo(b,VOL,FADE*1000);fadeTo(a,0,FADE*1000);const stopA=()=>{if(a.currentTime>=a.duration-.05||a.ended||a.volume<.01){a.pause();a._x=0}else setTimeout(stopA,200)};setTimeout(stopA,FADE*1000+100);cur=1-cur};
+   b.addEventListener('playing',go,{once:true});b.play().then(()=>{if(!b.paused&&b.currentTime>=0)setTimeout(go,a.duration-FADE-a.currentTime>0?(a.duration-FADE-a.currentTime)*1000:0)}).catch(()=>{a._x=0})}
  }
  let pend=[];
  function stopAll(){pair.forEach(a=>{fadeTo(a,0,600);pend.push(setTimeout(()=>a.pause(),650))});clearInterval(tm);tm=0}
