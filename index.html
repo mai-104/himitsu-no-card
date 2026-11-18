@@ -399,8 +399,14 @@ const BG=(()=>{
   {const d=progT-prog,v=Math.min(.035,Math.abs(d)*.9+.004)*dt;prog=Math.abs(d)<=v?progT:prog+Math.sign(d)*v}
   if(ok(DI.day_sky))cover(DI.day_sky);else sky('#9fd3f7','#eef8ff');
   // 太陽：残りカードの割合で左→右へ弧を描く
-  const sm=DI.day_sun,sz=W*.19,sx=W*(.12+.76*prog),sy=H*(.255-.065*Math.sin(Math.PI*prog));
+  // 夕方：低くなるにつれて空をうっすら茜色に
+  const ev=Math.pow(prog,1.4);
+  if(ev>0){const g=x.createLinearGradient(0,H,0,0);g.addColorStop(0,`rgba(255,150,100,${.45*ev})`);g.addColorStop(.55,`rgba(255,185,150,${.3*ev})`);g.addColorStop(1,`rgba(200,160,220,${.18*ev})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
+  // 太陽：左上の高い位置から、右下の桜の上へ沈んでいく
+  const q=1-prog,sm=DI.day_sun,sz=W*(.19+.03*prog),sx=W*(q*q*.12+2*q*prog*.5+prog*prog*.92),sy=H*(q*q*.25+2*q*prog*.58+prog*prog*.64);
+  if(ev>0){const gl=x.createRadialGradient(sx,sy,sz*.2,sx,sy,sz*1.6);gl.addColorStop(0,`rgba(255,140,60,${.55*ev})`);gl.addColorStop(1,'rgba(255,140,60,0)');x.fillStyle=gl;x.fillRect(sx-sz*2,sy-sz*2,sz*4,sz*4)}
   if(ok(sm))x.drawImage(sm,sx-sz/2,sy-sz/2,sz,sz);
+  if(ev>0){x.save();x.globalCompositeOperation='source-atop';x.restore()}
   // 雲：ゆっくり流れながら少しずつ形を変える
   for(const c of clouds){c.x+=c.v*dt;const m=DI['day_cloud'+c.k];if(!ok(m))continue;
    const w=c.w,h=w*m.naturalHeight/m.naturalWidth;if(c.x>W+20)Object.assign(c,dcloud(false));
@@ -415,6 +421,7 @@ const BG=(()=>{
   if(ok(fm)){const fh=H*.125,fw=Math.max(W*1.1,fm.naturalWidth*fh/fm.naturalHeight);
    x.save();x.translate((W+fw)/2,0);x.scale(-1,1);x.drawImage(fm,0,H-fh-H*.015,fw,fh);x.restore();
    x.drawImage(fm,(W-fw)/2+W*.04,H-fh+H*.055,fw,fh)}
+  if(ev>0){x.fillStyle=`rgba(255,160,110,${.14*ev})`;x.fillRect(0,0,W,H)}
   // 舞う花びら
   for(const p of P){
    p.y+=p.vy*dt; p.x+=(p.vx+Math.sin(t*.8+p.ph)*16)*dt; p.rot+=p.vr*dt;
