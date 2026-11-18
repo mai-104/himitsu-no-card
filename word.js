@@ -816,6 +816,7 @@ body.t0{--tapeA:#ff9fbf;--tapeB:rgba(255,255,255,.55)}
 body.t1{--tapeA:#2c3f8f;--tapeB:rgba(255,215,120,.6)}
 body.t2{--tapeA:#59c4ee;--tapeB:rgba(210,255,150,.6)}
 body.wd{--tapeA:#ffb6a3;--tapeB:rgba(255,255,255,.6)}
+body.wn #wgame .wcard .bk{background:url(wback_night.webp) center/100% 100% no-repeat;border-color:#e9d9a8}
 body.wn{--tapeA:#f2c46b;--tapeB:rgba(255,255,255,.55)}
 #wDone{position:absolute;left:0;right:0;bottom:6px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:0 6px;z-index:5;pointer-events:none}
 #wDone .chip{background:linear-gradient(180deg,#fff2c4,#ffd98a);border:1px solid #d9a640;color:#6b3e00;border-radius:8px;font-size:12px;font-weight:800;padding:5px 2px;text-align:center;white-space:nowrap;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.25);animation:pop .4s ease}
