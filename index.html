@@ -117,7 +117,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 /* クリア */
 #win{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:3000}
 #win.on{display:flex}
-#win .box,#wwin .box{position:relative;z-index:2}
+#win .box,#wwin .box{position:relative;z-index:2;background:color-mix(in srgb,var(--btn) 72%,transparent)!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 #win .box{background:var(--btn);color:var(--btnInk);border-radius:22px;padding:24px 22px;width:84%;max-width:340px;text-align:center}
 #win h2{margin:0 0 8px;font-size:28px}
 #win p{margin:4px 0 12px;font-size:15px}
@@ -228,7 +228,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 const BACKS=[{id:1,f:'back2.webp',n:'星と月',p:'⭐'},{id:3,f:'back4.webp',n:'雪の結晶',img:['snow_j.webp','snow_g.webp','snow_h.webp','snow_i.webp']}];
 const curBack=()=>BACKS.find(b=>b.id===pref.back)||BACKS[0];
 const FX={};['snowp_j','snowp_g','snowp_h','snowp_i','spk_gold','spk_blue','spk_pink','spk_lav','spk_white','nano_f','nano_p','cstar_y','cstar_p','cstar_m','cstar_b','cstar_v'].forEach(n=>{const m=new Image();m.src='fx/'+n+'.webp';FX[n]=m});
-const FXSET={3:['snowp_j','snowp_g','snowp_h','snowp_i'],1:['spk_gold','spk_white','spk_blue','spk_pink','spk_lav','spk_gold'],day:['nano_f','nano_f','nano_p'],night:['cstar_y','cstar_p','cstar_m','cstar_b','cstar_v','cstar_y']};
+const FXSET={3:['snowp_j','snowp_g','snowp_h','snowp_i'],1:['spk_gold','spk_white','spk_blue','spk_lav','spk_gold','spk_white'],day:['nano_f','nano_f','nano_p'],night:['cstar_y','cstar_p','cstar_m','cstar_b','cstar_v','cstar_y']};
 function celebrate(host){
  host=host||document.body;sfx('clear');
  const th=BG.cur(),set=FXSET[th]||FXSET[3];
@@ -239,19 +239,19 @@ function celebrate(host){
  const bursts=[[.22,.34,0],[.78,.27,.6],[.5,.17,1.2]];const fired=[0,0,0];
  function burst(bx,by){for(let i=0;i<22;i++){const a=i/22*6.283+R(0,.3),sp=R(170,400);ps.push({img:FX[set[Math.floor(R(0,set.length))]],x:bx*W,y:by*H,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:R(0,6.3),vr:R(-3,3),ph:R(0,6.3),z:sizeOf(),t:0,fv:R(35,65)})}}
  // 背景の演出（最後のひと押し）
- const kind=th===3?'snow':th==='day'?'sakura':'shoot';let spawned=0;const total=kind==='snow'?110:kind==='sakura'?140:22;
+ const kind=th===3?'snow':th==='day'?'sakura':'shoot';let spawned=0;const total=kind==='snow'?110:kind==='sakura'?140:40;const END=kind==='shoot'?9:7.2,SPAN=kind==='shoot'?6:3;
  function spawn(){
   if(kind==='snow'){const k=['snow_j','snow_g','snow_h','snow_i'][Math.floor(R(0,4))],m=new Image();m.src=k+'.webp';bg.push({k:'s',img:m,x:R(-20,W+20),y:R(-80,-20),z:Math.random()<.25?R(26,44):R(10,24),vy:R(70,150),sw:R(10,30),ph:R(0,6.3),r:R(0,6.3),vr:R(-1,1),t:0})}
-  else if(kind==='sakura'){bg.push({k:'p',x:R(-W*.4,W*.3),y:R(-H*.2,H*.8),s:R(6,12),vx:R(160,300),vy:R(20,70),ph:R(0,6.3),r:R(0,6.3),vr:R(-4,4),fl:R(2,4),t:0,c:Math.random()<.5?'#ffb9cf':'#ffd1df'})}
+  else if(kind==='sakura'){bg.push({k:'p',x:R(-20,W+20),y:H+R(10,60),s:R(6,12),vx:R(-25,25),vy:-R(800,1300),ph:R(0,6.3),r:R(0,6.3),vr:R(-4,4),fl:R(2,4),t:0,c:Math.random()<.5?'#ffb9cf':'#ffd1df'})}
   else bg.push({k:'m',x:R(W*.1,W*1.3),y:R(-H*.1,H*.6),len:R(70,150),sp:R(1.1,1.7),t:0,w:R(1.5,3)});
  }
  function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;x.clearRect(0,0,W,H);
   bursts.forEach(([bx,by,d],i)=>{if(!fired[i]&&t>=d){fired[i]=1;burst(bx,by)}});
-  if(t>1.5){const want=Math.min(total,Math.floor((t-1.5)/(kind==='shoot'?1.6:3)*total));while(spawned<want){spawn();spawned++}}
+  if(t>1.5){const want=Math.min(total,Math.floor((t-1.5)/SPAN*total));while(spawned<want){spawn();spawned++}}
   // 背景演出（花火の後ろ）
-  for(const b of bg){b.t+=dt;const o=Math.min(1,b.t*3)*Math.max(0,Math.min(1,(6.5-t)/1.2));
+  for(const b of bg){b.t+=dt;const o=Math.min(1,b.t*3)*Math.max(0,Math.min(1,(END-.7-t)/1.2));
    if(b.k==='s'){b.y+=b.vy*dt;b.x+=Math.sin(t*1.5+b.ph)*b.sw*dt;b.r+=b.vr*dt;if(!b.img.complete)continue;x.save();x.translate(b.x,b.y);x.rotate(b.r);x.globalAlpha=.9*o;x.drawImage(b.img,-b.z/2,-b.z/2,b.z,b.z);x.restore()}
-   else if(b.k==='p'){b.x+=(b.vx+Math.sin(t*2+b.ph)*40)*dt;b.y+=(b.vy+Math.cos(t*1.7+b.ph)*30)*dt;b.r+=b.vr*dt;x.save();x.translate(b.x,b.y);x.rotate(b.r);x.scale(1,Math.abs(Math.cos(t*b.fl+b.ph))*.8+.2);x.globalAlpha=.95*o;x.fillStyle=b.c;const q=b.s;x.beginPath();x.moveTo(0,-q);x.quadraticCurveTo(q*.9,-q*.4,q*.35,q*.9);x.lineTo(0,q*.55);x.lineTo(-q*.35,q*.9);x.quadraticCurveTo(-q*.9,-q*.4,0,-q);x.fill();x.restore()}
+   else if(b.k==='p'){const kk=1-Math.exp(-1.8*dt);b.vy+=(R(28,40)-b.vy)*kk;b.x+=(b.vx+Math.sin(t*1.6+b.ph)*35)*dt;b.y+=b.vy*dt;b.r+=b.vr*dt;x.save();x.translate(b.x,b.y);x.rotate(b.r);x.scale(1,Math.abs(Math.cos(t*b.fl+b.ph))*.8+.2);x.globalAlpha=.95*o;x.fillStyle=b.c;const q=b.s;x.beginPath();x.moveTo(0,-q);x.quadraticCurveTo(q*.9,-q*.4,q*.35,q*.9);x.lineTo(0,q*.55);x.lineTo(-q*.35,q*.9);x.quadraticCurveTo(-q*.9,-q*.4,0,-q);x.fill();x.restore()}
    else{const d=b.t*W*b.sp,hx=b.x-d*.85,hy=b.y+d*.5,tl=Math.min(b.len,d),f=Math.max(0,Math.min(1,(1.2-b.t)*3))*o;
     const lg=x.createLinearGradient(hx,hy,hx+tl*.85,hy-tl*.5);lg.addColorStop(0,`rgba(255,250,225,${f})`);lg.addColorStop(1,'rgba(255,250,225,0)');x.strokeStyle=lg;x.lineWidth=b.w;x.beginPath();x.moveTo(hx,hy);x.lineTo(hx+tl*.85,hy-tl*.5);x.stroke();
     x.globalAlpha=f;x.fillStyle='#fffbe6';x.beginPath();x.arc(hx,hy,b.w*1.3,0,6.3);x.fill();x.globalAlpha=1}}
@@ -260,7 +260,7 @@ function celebrate(host){
    const o=p.t<5?1:Math.max(0,1-(p.t-5)/1.8);if(o<=0||!p.img.complete)continue;const tw=th===1?.75+.35*Math.sin(p.t*8+p.ph):1,z=p.z*tw;
    x.save();x.translate(p.x,p.y);x.rotate(p.r);x.globalAlpha=o;x.drawImage(p.img,-z/2,-z/2,z,z);x.restore()}
   x.globalAlpha=1;
-  if(t<7.2&&cv.isConnected)requestAnimationFrame(step);else cv.remove();
+  if(t<END&&cv.isConnected)requestAnimationFrame(step);else cv.remove();
  }
  requestAnimationFrame(step);
 }
@@ -396,7 +396,7 @@ const BG=(()=>{
  function cover(m){const s=Math.max(W/m.naturalWidth,H/m.naturalHeight),w=m.naturalWidth*s,h=m.naturalHeight*s;x.drawImage(m,(W-w)/2,(H-h)/2,w,h)}
  function dcloud(any){return{k:1+Math.floor(R(0,4)),x:any?R(-W*.2,W*.9):-W*.6,y:R(H*.2,H*.62),w:R(W*.3,W*.52),v:R(4,9),a:R(.7,.92),ph:R(0,6.3),fs:R(.12,.3)}}
  function drawDay(dt){
-  prog+=(progT-prog)*Math.min(1,dt*1.5);
+  {const d=progT-prog,v=Math.min(.035,Math.abs(d)*.9+.004)*dt;prog=Math.abs(d)<=v?progT:prog+Math.sign(d)*v}
   if(ok(DI.day_sky))cover(DI.day_sky);else sky('#9fd3f7','#eef8ff');
   // 太陽：残りカードの割合で左→右へ弧を描く
   const sm=DI.day_sun,sz=W*.19,sx=W*(.12+.76*prog),sy=H*(.255-.065*Math.sin(Math.PI*prog));
@@ -438,11 +438,11 @@ const BG=(()=>{
  function twinkle(){for(const s of stars){x.globalAlpha=(.5+.5*Math.sin(t*s.sp+s.ph))*.9;x.fillStyle=s.c||'#fffbe8';const r=s.r*2.2;
    x.beginPath();x.moveTo(s.x,s.y-r);x.quadraticCurveTo(s.x,s.y,s.x+r,s.y);x.quadraticCurveTo(s.x,s.y,s.x,s.y+r);x.quadraticCurveTo(s.x,s.y,s.x-r,s.y);x.quadraticCurveTo(s.x,s.y,s.x,s.y-r);x.fill()}x.globalAlpha=1}
  function drawNight(dt){
-  prog+=(progT-prog)*Math.min(1,dt*1.5);
+  {const d=progT-prog,v=Math.min(.035,Math.abs(d)*.9+.004)*dt;prog=Math.abs(d)<=v?progT:prog+Math.sign(d)*v}
   if(ok(DI.night_sky))cover(DI.night_sky);else sky('#14205a','#6b5aa8');
   twinkle();
   // 月：左下（建物の裏）から右上へ。細い三日月→満月へなめらかに満ちる
-  const p=prog,q=1-p,mxp=q*q*W*.14+2*q*p*W*.08+p*p*W*.84,myp=q*q*H*.9+2*q*p*H*.24+p*p*H*.225;
+  const p=prog,q=1-p,mxp=q*q*W*.06+2*q*p*W*.36+p*p*W*.88,myp=q*q*H*.88+2*q*p*H*.5+p*p*H*.6;
   const r=W*.085,k=.1+.9*p,e=1-2*k,mm=DI.night_moon;
   const gl=x.createRadialGradient(mxp,myp,r*.8,mxp,myp,r*3.2);gl.addColorStop(0,`rgba(255,240,200,${.15+.3*k})`);gl.addColorStop(1,'rgba(255,240,200,0)');x.fillStyle=gl;x.fillRect(mxp-r*4,myp-r*4,r*8,r*8);
   if(ok(mm)){const S=Math.ceil(r*2*dpr)+2;mc.width=mc.height=S;const R0=S/2-1;

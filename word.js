@@ -63,7 +63,7 @@ const WORDS=[ /* i:1 = イラストのカード（絵はあとで入れる） */
  {t:'白雪姫',i:1,w:['七人の小人','毒りんご','魔法の鏡','お妃','ガラスの棺']},
  {t:'シンデレラ',i:1,w:['ガラスの靴','かぼちゃの馬車','魔法使い','舞踏会','十二時の鐘','灰']},
  {t:'桃太郎',i:1,w:['きびだんご','キジ','猿','犬','鬼ヶ島','鬼','大きな桃']},
- {t:'かぐや姫',i:1,w:['竹','月の使者','天の羽衣','竹取の翁','五つの難題']},
+ {t:'かぐや姫',i:1,w:['光る竹','月の使者','天の羽衣','竹取の翁','五つの難題']},
  {t:'浦島太郎',i:1,w:['亀','竜宮城','乙姫','玉手箱','白い煙']},
  {t:'飲み物',i:1,w:['水','お茶','ジュース','コーヒー','紅茶','牛乳','ココア']},
  {t:'お酒',i:1,w:['ビール','ワイン','日本酒','焼酎','ウイスキー','カクテル']},
@@ -98,7 +98,7 @@ const WORDS=[ /* i:1 = イラストのカード（絵はあとで入れる） */
  {t:'風物詩',i:1,w:['花火','風鈴','こいのぼり','お月見','紅葉狩り','かき氷']},
  {t:'性格',i:1,w:['やさしい','まじめ','明るい','のんびり','せっかち','がんこ','優柔不断']},
  {t:'感情',i:1,w:['うれしい','かなしい','こわい','たのしい','さみしい','くやしい']},
- {t:'褒める',i:1,w:['すごい','えらい','さすが','かっこいい','かわいい','天才']},
+ {t:'褒める',i:1,w:['すごい！','えらい！','さすが！','かっこいい！','かわいい！','天才！']},
 ];
 const NG=[
  ['動物園','哺乳類'],
@@ -271,12 +271,12 @@ const IMG={
  'せっかち':'ps_sekkachi',
  'がんこ':'ps_ganko',
  '優柔不断':'ps_yuujuu',
- 'すごい':'hm_sugoi',
- 'えらい':'hm_erai',
- 'さすが':'hm_sasuga',
- 'かっこいい':'hm_kakkoii',
- 'かわいい':'hm_kawaii',
- '天才':'hm_tensai',
+ 'すごい！':'hm_sugoi',
+ 'えらい！':'hm_erai',
+ 'さすが！':'hm_sasuga',
+ 'かっこいい！':'hm_kakkoii',
+ 'かわいい！':'hm_kawaii',
+ '天才！':'hm_tensai',
  'アナグラム':'an_anagram',
  'モールス信号':'an_morse',
  'シーザー暗号':'an_caesar',
@@ -736,7 +736,7 @@ const IMG={
  '鬼ヶ島':'onigashima',
  '鬼':'oni',
  '大きな桃':'ookinamomo',
- '竹':'take',
+ '光る竹':'take',
  '月の使者':'tsukinoshisha',
  '天の羽衣':'hagoromo',
  '竹取の翁':'okina',
@@ -801,7 +801,10 @@ const css=`
 #wgame .wcard .wd{position:absolute;left:4%;right:4%;top:0;height:25%;display:flex;align-items:center;justify-content:center;font-weight:700;white-space:nowrap;line-height:1}
 #wgame .wcard.ttl .fc{background:linear-gradient(180deg,#fff2c4,#ffd98a);border-color:#d9a640;color:#6b3e00}
 #wgame .wcard.ttl .wd{font-weight:800}
-#wgame .wcard .lb{position:absolute;left:0;right:0;bottom:8%;text-align:center;font-size:calc(var(--wh)*.2);opacity:.75;font-weight:700}
+#wgame .wcard.ttl:not(.cov) .wd{top:12%;height:40%;font-size:var(--big)!important}
+#wgame .wcard.ttl.cov .lb{display:none}
+#wgame .wcard .lb{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-size:calc(var(--wh)*.17);opacity:.75;font-weight:700;display:flex;flex-direction:column;line-height:1.2}
+#wgame .wcard .lb .ln:empty{display:none}
 #wgame .wcard.hint .fc{box-shadow:0 0 0 3px #ffd34d,0 1px 2px rgba(0,0,0,.3)}
 #wgame .wcard.shake .in{animation:shake .3s}
 #wgame .wcard.gone{transition:transform .35s ease,opacity .35s ease;opacity:0}
@@ -917,7 +920,7 @@ function buildEls(){
   el.className='wcard'+(c.t?' ttl':'');
   const im=c.t?null:(IMG[WORDS[c.g].t+'/'+c.label]||(WORDS.some((x,i)=>i!==c.g&&x.w.includes(c.label))?null:IMG[c.label]));
   const pic=im?`<div class="pic" style="background-image:url(img/${im}.webp)"></div>`:(!c.t&&PAT[c.label]?`<div class="pic" style='${patBg(PAT[c.label])}'></div>`:'');
-  el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc">${pic}<div class="wd">${c.label}</div>${c.t?'<div class="lb">タイトル</div>':''}</div></div>`;
+  el.innerHTML=`<div class="in"><div class="bk"></div><div class="fc">${pic}<div class="wd">${c.label}</div>${c.t?'<div class="lb"><span class="lt">タイトル</span><span class="ln"></span></div>':''}</div></div>`;
   board.appendChild(el); els[c.id]=el;
  });
  for(let i=0;i<NSLOT;i++){const d=document.createElement('div');d.className='wslot';d.dataset.pile='slot';d.dataset.pi=i;d.textContent='タイトルを\n置く';d.style.whiteSpace='pre';board.appendChild(d);slotEls[i]=d}
@@ -938,7 +941,7 @@ function layout(){
  const R=document.documentElement.style;R.setProperty('--ww',cw+'px');R.setProperty('--wh',ch+'px');
  for(let i=0;i<NSLOT;i++)slotEls[i].style.transform=`translate(${colX(i)}px,${y0}px)`;
  slotEls.stock.style.transform=`translate(${colX(4)}px,${y0}px)`;
- G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].reduce((a,ch)=>a+(/[\x20-\x7e]/.test(ch)?(/[A-Z]/.test(ch)?.68:.56):1),0);wd.style.fontSize=Math.min(ch*BAND*.82,(cw*.92)/Math.max(len,2.2))+'px'});
+ G.cards.forEach(c=>{const wd=els[c.id].querySelector('.wd');const len=[...c.label].reduce((a,ch)=>a+(/[\x20-\x7e]/.test(ch)?(/[A-Z]/.test(ch)?.68:.56):1),0);wd.style.fontSize=Math.min(ch*BAND*.82,(cw*.92)/Math.max(len,2.2))+'px';if(c.t)els[c.id].style.setProperty('--big',Math.min(ch*.3,(cw*.9)/Math.max(len,2.2))+'px')});
  render();
 }
 function renderDone(){
@@ -962,26 +965,26 @@ function render(){
  {const placed=G.done*(NEED+1)+G.slots.reduce((a,s)=>a+(s?1+s.names.length:0),0);BG.setProg(G.won?1:placed/G.cards.length,!render._g||render._g!==G);render._g=G}
  const vis=new Set();
  G.stock.forEach((p,i)=>{place(p,colX(4),y0,10+i,'stock',0,i);vis.add(p.id)});
- G.waste.forEach((p,i)=>{place(p,colX(4),yW,10+i,'waste',0,i);vis.add(p.id)});
+ G.waste.forEach((p,i)=>{place(p,colX(4),yW,10+i,'waste',0,i);vis.add(p.id);els[p.id].classList.toggle('cov',i<G.waste.length-1)});
  G.slots.forEach((s,si)=>{
   slotEls[si].style.visibility=s?'hidden':'visible';
   if(!s)return;
-  place({id:s.title,up:true},colX(si),y0,10,'slot',si,0);vis.add(s.title);
+  place({id:s.title,up:true},colX(si),y0,10,'slot',si,0);vis.add(s.title);els[s.title].classList.remove('cov');
   s.names.forEach((id,i)=>{place({id,up:true},colX(si),yW+i*os,11+i,'slotn',si,i);vis.add(id)});
-  els[s.title].querySelector('.lb').textContent=`${s.names.length} / ${NEED}`;
+  els[s.title].querySelector('.ln').textContent=`${s.names.length} / ${NEED}`;
  });
  renderDone();
  G.tab.forEach((col,ci)=>{
   const o=colOff(col); let y=tabTop;
   col.forEach((p,i)=>{
-   place(p,colX(ci),y,100+i,'tab',ci,i);vis.add(p.id);
+   place(p,colX(ci),y,100+i,'tab',ci,i);vis.add(p.id);els[p.id].classList.toggle('cov',i<col.length-1);
    const prev=col[i-1], c=CARD[p.id];
    els[p.id].classList.toggle('tape',!!(prev&&prev.up&&p.up&&c.t===0&&CARD[prev.id].t===0&&CARD[prev.id].g===c.g));
    y+=o;
   });
  });
  G.cards.forEach(c=>{if(!vis.has(c.id)){const e=els[c.id];e.style.display='none'}else els[c.id].style.display=''});
- G.cards.filter(c=>c.t).forEach(c=>{if(!G.slots.some(s=>s&&s.title===c.id))els[c.id].querySelector('.lb').textContent='タイトル'});
+ G.cards.filter(c=>c.t).forEach(c=>{if(!G.slots.some(s=>s&&s.title===c.id))els[c.id].querySelector('.ln').textContent=''});
  slotEls.stock.textContent=G.stock.length?'':(G.waste.length?'↻':'');
  $('wMoves').textContent=G.moves+'手';
  renderTools();
