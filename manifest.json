@@ -1,7 +1,7 @@
 {
   "id": "/himitsu-no-card/",
-  "name": "秘密のカード",
-  "short_name": "秘密のカード",
+  "name": "秘密のカードならべ",
+  "short_name": "秘密のカードならべ",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

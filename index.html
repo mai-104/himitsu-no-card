@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2b2350">
-<title>秘密のカード</title>
+<title>秘密のカードならべ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
@@ -132,7 +132,7 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 
 <!-- タイトル画面 -->
 <section id="title" class="screen on">
- <h1>秘密のカード</h1>
+ <h1>秘密のカードならべ</h1>
  <div class="sub">（仮）ひとりで遊ぶトランプ</div>
 
  <div class="panel">
@@ -227,21 +227,40 @@ body.t2{--bgA:#0a6a88;--bgB:#43b9d3;--ink:#f2fbff;--bar:rgba(0,40,60,.35);--btn:
 (()=>{
 const BACKS=[{id:1,f:'back2.webp',n:'星と月',p:'⭐'},{id:3,f:'back4.webp',n:'雪の結晶',img:['snow_j.webp','snow_g.webp','snow_h.webp','snow_i.webp']}];
 const curBack=()=>BACKS.find(b=>b.id===pref.back)||BACKS[0];
+const FX={};['snowp_j','snowp_g','snowp_h','snowp_i','spk_gold','spk_blue','spk_pink','spk_lav','spk_white','nano_f','nano_p','cstar_y','cstar_p','cstar_m','cstar_b','cstar_v'].forEach(n=>{const m=new Image();m.src='fx/'+n+'.webp';FX[n]=m});
+const FXSET={3:['snowp_j','snowp_g','snowp_h','snowp_i'],1:['spk_gold','spk_white','spk_blue','spk_pink','spk_lav','spk_gold'],day:['nano_f','nano_f','nano_p'],night:['cstar_y','cstar_p','cstar_m','cstar_b','cstar_v','cstar_y']};
 function celebrate(host){
- host=host||document.body;
- sfx('clear');
- const W=innerWidth,H=innerHeight,ps=[];let last=performance.now(),run=true;
- [[.22,.34,0],[.78,.27,600],[.5,.17,1200]].forEach(([bx,by,dl])=>setTimeout(()=>{
-  for(let i=0;i<20;i++){const e=document.createElement('div');e.className='spark';petalFill(e);host.appendChild(e);
-   const a=i/20*6.283+Math.random()*.3,sp=170+Math.random()*230;
-   ps.push({e,x:bx*W,y:by*H,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:Math.random()*360,vr:(Math.random()-.5)*160,ph:Math.random()*6.3,t:0,fv:35+Math.random()*30})}
- },dl));
- function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;let alive=0;
-  for(const p of ps){if(p.done)continue;p.t+=dt;const k=1-Math.exp(-2.6*dt);
-   p.vx-=p.vx*k;p.vy+=(p.fv-p.vy)*k;p.x+=(p.vx+Math.sin(p.t*2.2+p.ph)*18)*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;
-   const o=p.t<5?1:Math.max(0,1-(p.t-5)/1.8);p.e.style.opacity=o;p.e.style.transform=`translate(${p.x}px,${p.y}px) translate(-50%,-50%) rotate(${p.r}deg)`;
-   if(o<=0||p.y>H+40){p.e.remove();p.done=1}else alive++}
-  if(alive||ps.length<60)requestAnimationFrame(step);
+ host=host||document.body;sfx('clear');
+ const th=BG.cur(),set=FXSET[th]||FXSET[3];
+ const cv=document.createElement('canvas');cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none';host.appendChild(cv);
+ const W=innerWidth,H=innerHeight,dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+ const R=(a,b)=>a+Math.random()*(b-a),ps=[],bg=[];let t=0,last=performance.now();
+ const sizeOf=()=>th===1?(Math.random()<.3?R(40,60):R(18,34)):th==='night'?R(16,30):th==='day'?R(12,24):R(14,32);
+ const bursts=[[.22,.34,0],[.78,.27,.6],[.5,.17,1.2]];const fired=[0,0,0];
+ function burst(bx,by){for(let i=0;i<22;i++){const a=i/22*6.283+R(0,.3),sp=R(170,400);ps.push({img:FX[set[Math.floor(R(0,set.length))]],x:bx*W,y:by*H,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:R(0,6.3),vr:R(-3,3),ph:R(0,6.3),z:sizeOf(),t:0,fv:R(35,65)})}}
+ // 背景の演出（最後のひと押し）
+ const kind=th===3?'snow':th==='day'?'sakura':'shoot';let spawned=0;const total=kind==='snow'?110:kind==='sakura'?140:22;
+ function spawn(){
+  if(kind==='snow'){const k=['snow_j','snow_g','snow_h','snow_i'][Math.floor(R(0,4))],m=new Image();m.src=k+'.webp';bg.push({k:'s',img:m,x:R(-20,W+20),y:R(-80,-20),z:Math.random()<.25?R(26,44):R(10,24),vy:R(70,150),sw:R(10,30),ph:R(0,6.3),r:R(0,6.3),vr:R(-1,1),t:0})}
+  else if(kind==='sakura'){bg.push({k:'p',x:R(-W*.4,W*.3),y:R(-H*.2,H*.8),s:R(6,12),vx:R(160,300),vy:R(20,70),ph:R(0,6.3),r:R(0,6.3),vr:R(-4,4),fl:R(2,4),t:0,c:Math.random()<.5?'#ffb9cf':'#ffd1df'})}
+  else bg.push({k:'m',x:R(W*.1,W*1.3),y:R(-H*.1,H*.6),len:R(70,150),sp:R(1.1,1.7),t:0,w:R(1.5,3)});
+ }
+ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;x.clearRect(0,0,W,H);
+  bursts.forEach(([bx,by,d],i)=>{if(!fired[i]&&t>=d){fired[i]=1;burst(bx,by)}});
+  if(t>1.5){const want=Math.min(total,Math.floor((t-1.5)/(kind==='shoot'?1.6:3)*total));while(spawned<want){spawn();spawned++}}
+  // 背景演出（花火の後ろ）
+  for(const b of bg){b.t+=dt;const o=Math.min(1,b.t*3)*Math.max(0,Math.min(1,(6.5-t)/1.2));
+   if(b.k==='s'){b.y+=b.vy*dt;b.x+=Math.sin(t*1.5+b.ph)*b.sw*dt;b.r+=b.vr*dt;if(!b.img.complete)continue;x.save();x.translate(b.x,b.y);x.rotate(b.r);x.globalAlpha=.9*o;x.drawImage(b.img,-b.z/2,-b.z/2,b.z,b.z);x.restore()}
+   else if(b.k==='p'){b.x+=(b.vx+Math.sin(t*2+b.ph)*40)*dt;b.y+=(b.vy+Math.cos(t*1.7+b.ph)*30)*dt;b.r+=b.vr*dt;x.save();x.translate(b.x,b.y);x.rotate(b.r);x.scale(1,Math.abs(Math.cos(t*b.fl+b.ph))*.8+.2);x.globalAlpha=.95*o;x.fillStyle=b.c;const q=b.s;x.beginPath();x.moveTo(0,-q);x.quadraticCurveTo(q*.9,-q*.4,q*.35,q*.9);x.lineTo(0,q*.55);x.lineTo(-q*.35,q*.9);x.quadraticCurveTo(-q*.9,-q*.4,0,-q);x.fill();x.restore()}
+   else{const d=b.t*W*b.sp,hx=b.x-d*.85,hy=b.y+d*.5,tl=Math.min(b.len,d),f=Math.max(0,Math.min(1,(1.2-b.t)*3))*o;
+    const lg=x.createLinearGradient(hx,hy,hx+tl*.85,hy-tl*.5);lg.addColorStop(0,`rgba(255,250,225,${f})`);lg.addColorStop(1,'rgba(255,250,225,0)');x.strokeStyle=lg;x.lineWidth=b.w;x.beginPath();x.moveTo(hx,hy);x.lineTo(hx+tl*.85,hy-tl*.5);x.stroke();
+    x.globalAlpha=f;x.fillStyle='#fffbe6';x.beginPath();x.arc(hx,hy,b.w*1.3,0,6.3);x.fill();x.globalAlpha=1}}
+  // 花火
+  for(const p of ps){p.t+=dt;const k=1-Math.exp(-2.6*dt);p.vx-=p.vx*k;p.vy+=(p.fv-p.vy)*k;p.x+=(p.vx+Math.sin(p.t*2.2+p.ph)*18)*dt;p.y+=p.vy*dt;p.r+=p.vr*dt*(th===1?.3:1);
+   const o=p.t<5?1:Math.max(0,1-(p.t-5)/1.8);if(o<=0||!p.img.complete)continue;const tw=th===1?.75+.35*Math.sin(p.t*8+p.ph):1,z=p.z*tw;
+   x.save();x.translate(p.x,p.y);x.rotate(p.r);x.globalAlpha=o;x.drawImage(p.img,-z/2,-z/2,z,z);x.restore()}
+  x.globalAlpha=1;
+  if(t<7.2&&cv.isConnected)requestAnimationFrame(step);else cv.remove();
  }
  requestAnimationFrame(step);
 }
@@ -448,6 +467,7 @@ const BG=(()=>{
   start(){resize();cancelAnimationFrame(raf);if(pref.anim){last=performance.now();raf=requestAnimationFrame(frame)}},
   stop(){cancelAnimationFrame(raf);raf=0},
   setOv(v){ov=v},
+  cur(){return want()},
   setProg(v,jump){progT=Math.max(0,Math.min(1,v));if(jump)prog=progT;if(!raf&&W)draw(0)},
   resize(){if(cv.clientWidth)resize()}
  };
