@@ -281,6 +281,7 @@ const IMG={
  'つみき':'tsumiki',
  'ブロック':'block',
  'ぬいぐるみ':'nuigurumi',
+'ペット/犬':'pt_inu','ペット/猫':'pt_neko','ペット/ウサギ':'pt_usagi','ペット/ハムスター':'pt_hamster','ペット/金魚':'pt_kingyo','ペット/フェレット':'pt_ferret',
 '結婚式/チャペル':'wd_chapel','結婚式/新郎新婦':'wd_shinrou','結婚式/指輪交換':'wd_ring','結婚式/キャンドルサービス':'wd_candle','結婚式/ケーキ入刀':'wd_cake','結婚式/フラワーシャワー':'wd_flowershower','結婚式/披露宴':'wd_hiroen',
 'お金/円':'ok_yen','お金/ドル':'ok_dollar','お金/ユーロ':'ok_euro','お金/ポンド':'ok_pound','お金/ウォン':'ok_won','お金/人民元':'ok_yuan','お金/ルピー':'ok_rupee',
 '働く車/ダンプカー':'hk_dump','働く車/クレーン車':'hk_crane','働く車/ショベルカー':'hk_shovel','働く車/ブルドーザー':'hk_bulldozer','働く車/ミキサー車':'hk_mixer','働く車/ゴミ収集車':'hk_gomi','働く車/フォークリフト':'hk_forklift','働く車/消防車':'hk_shoubou','働く車/救急車':'hk_kyuukyuu',
